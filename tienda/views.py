@@ -5,13 +5,19 @@ from .models import Producto
 # Create your views here.
 
 def home(request):
-    context={}
-    return render(request, 'tienda/index.html', context)
-
-def lista_productos(request):
-    productos = Producto.objects.all()
-    return render(request, 'tienda/lista_productos.html', {'productos': productos})
+    return render(request, 'tienda/home.html')
 
 def category(request):
-    context={}
-    return render(request, 'tienda/category.html', context)
+    return render(request, 'tienda/category.html')
+
+def checkout(request):
+    return render(request, 'tienda/checkout.html')
+
+def confirmation(request):
+    return render(request, 'tienda/confirmation.html')
+
+def single_product(request):
+    return render(request, 'tienda/single_product.html')
+
+def cart(request):
+    return render(request, 'tienda/cart.html')
