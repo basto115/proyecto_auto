@@ -21,3 +21,9 @@ def single_product(request):
 
 def cart(request):
     return render(request, 'tienda/cart.html')
+
+def blog(request):
+    return render(request, 'tieda/blog.html')
+
+def single_blog(request):
+    return render(request, 'single_blog')

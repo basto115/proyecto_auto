@@ -10,4 +10,6 @@ urlpatterns = [
     path('confirmation', views.confirmation, name="confirmation"),
     path('single-product', views.single_product, name="single_product"),
     path('cart', views.cart, name="cart"),
+    path('blog', views.blog, name="blog"),
+    path('single_blog', views.single_blog, name="single_blog"),
 ]
