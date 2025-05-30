@@ -23,7 +23,7 @@ def cart(request):
     return render(request, 'tienda/cart.html')
 
 def blog(request):
-    return render(request, 'tieda/blog.html')
+    return render(request, 'tienda/blog.html')
 
 def single_blog(request):
-    return render(request, 'single_blog')
+    return render(request, 'tienda/single_blog.html')
