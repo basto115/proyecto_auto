@@ -33,3 +33,6 @@ def login(request):
 
 def tracking(request):
     return render(request, 'tienda/tracking.html')
+
+def contact(request):
+    return render(request, 'tienda/contact.html')
