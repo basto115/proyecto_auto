@@ -28,6 +28,11 @@ class CustomUser(AbstractUser):
     def __str__(self):
         return self.email
 
+class Categoria(models.Model):
+    nombre = models.CharField(max_length=100)
+
+    def __str__(self):
+        return self.nombre
 
 # Modelo de Producto (productos_producto)
 class Producto(models.Model):
@@ -43,20 +48,34 @@ class Producto(models.Model):
     activo = models.BooleanField(default=True)
     fecha_creacion = models.DateTimeField(auto_now_add=True)
     autor = models.ForeignKey(CustomUser, on_delete=models.CASCADE)  # Relación con el autor (usuario)
-
+    imagen = models.ImageField(upload_to='productos/', null=True, blank=True)
+    categoria = models.ForeignKey(Categoria, on_delete=models.CASCADE, null=True, blank=True)
+    destacado = models.BooleanField(default=False)
+    
     def __str__(self):
         return self.nombre
 
 
 # Modelo de Pedido (pedidos_pedido)
 class Pedido(models.Model):
+    ESTADOS_PEDIDO = [
+        ('pendiente', 'Pendiente'),
+        ('pagado', 'Pagado'),
+        ('recolectando', 'Recolectando productos'),
+        ('recolectado', 'Productos recolectados'),
+        ('en_reparto', 'En reparto'),
+        ('entregado', 'Entregado'),
+    ]
+    
     cliente = models.ForeignKey(CustomUser, on_delete=models.CASCADE)  # Relación con el cliente (usuario)
     tipo_entrega = models.CharField(max_length=50, choices=[('retiro', 'Retiro'), ('domicilio', 'Domicilio')])
     direccion_entrega = models.CharField(max_length=255, blank=True, null=True, default="No especificado")  # Valor predeterminado
     fecha_creacion = models.DateTimeField(auto_now_add=True)
+    
+    estado = models.CharField(max_length=20, choices=ESTADOS_PEDIDO, default='pendiente')
 
     def __str__(self):
-        return f"Pedido #{self.id} - {self.cliente}"
+        return f"Pedido #{self.id} - {self.cliente} - {self.estado}"
 
 
 # Modelo de PedidoProducto (pedidos_pedidoproducto)
