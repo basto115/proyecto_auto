@@ -1,0 +1,53 @@
+{% extends "tienda/base.html" %}
+{% load static %}
+
+{% block title %}Catálogo de Repuestos{% endblock %}
+
+{% block content %}
+<section class="mt-5">
+    <div class="container">
+        <h2 class="text-center mb-4">Catálogo de Productos</h2>
+
+        {% for categoria in categorias %}
+            <h4 class="mt-4">{{ categoria.nombre }}</h4>
+            <div class="row">
+				<form method="get" class="mb-4">
+					<div class="form-row align-items-center">
+						<div class="col-auto">
+							<label class="sr-only" for="categoria">Categoría</label>
+							<select name="categoria" id="categoria" class="form-control" onchange="this.form.submit()">
+								<option value="">-- Todas las categorías --</option>
+								{% for cat in categorias %}
+									<option value="{{ cat.id }}" {% if cat.id == categoria_id %}selected{% endif %}>
+										{{ cat.nombre }}
+									</option>
+								{% endfor %}
+							</select>
+						</div>
+					</div>
+				</form>
+                {% for producto in productos %}
+					<div class="col-lg-3 col-md-4 col-sm-6 mb-4">
+						<div class="card h-100 shadow-sm">
+							{% if producto.imagen %}
+								<img src="{{ producto.imagen.url }}" class="card-img-top" alt="{{ producto.nombre }}">
+							{% else %}
+								<img src="{% static 'img/placeholder.png' %}" class="card-img-top" alt="Sin imagen">
+							{% endif %}
+							<div class="card-body text-center">
+								<h5 class="card-title">{{ producto.nombre }}</h5>
+								<p class="card-text">${{ producto.precio_unitario }}</p>
+								<a href="{% url 'agregar_producto' producto.id %}" class="btn btn-sm btn-success mt-2">
+									Agregar al carrito
+								</a>
+							</div>
+						</div>
+					</div>
+				{% endfor %}
+            </div>
+        {% empty %}
+            <p>No hay categorías disponibles.</p>
+        {% endfor %}
+    </div>
+</section>
+{% endblock %}
