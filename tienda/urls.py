@@ -12,4 +12,6 @@ urlpatterns = [
     path('cart', views.cart, name="cart"),
     path('blog', views.blog, name="blog"),
     path('single_blog', views.single_blog, name="single_blog"),
+    path('login', views.login, name="login"),
+    path('tracking', views.tracking, name="tracking"),
 ]

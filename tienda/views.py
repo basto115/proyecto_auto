@@ -27,3 +27,9 @@ def blog(request):
 
 def single_blog(request):
     return render(request, 'tienda/single_blog.html')
+
+def login(request):
+    return render(request, 'tienda/login.html')
+
+def tracking(request):
+    return render(request, 'tienda/tracking.html')
