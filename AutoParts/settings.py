@@ -130,3 +130,7 @@ import os
 
 MEDIA_URL = '/media/'
 MEDIA_ROOT = os.path.join(BASE_DIR, 'media')
+
+#Mercadopago
+
+MERCADO_PAGO_ACCESS_TOKEN = "TEST-2503451685170062-053119-ca3c6e493e1d1e83680dac41e9c92843-194855140"
