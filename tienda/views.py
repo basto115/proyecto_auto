@@ -64,8 +64,6 @@ def single_product(request, producto_id):
     producto = Producto.objects.get(id=producto_id)
     return render(request, 'tienda/single_product.html', {'producto': producto})
 
-def cart(request):
-    return render(request, 'tienda/cart.html')
 
 def blog(request):
     return render(request, 'tienda/blog.html')
