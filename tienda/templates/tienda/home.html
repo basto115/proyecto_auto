@@ -17,7 +17,7 @@
 	<!-- meta character set -->
 	<meta charset="UTF-8">
 	<!-- Site Title -->
-	<title>Karma Shop</title>
+	<title>AutoParts</title>
 	<!--
 		CSS
 		============================================= -->
@@ -57,29 +57,46 @@
 							<li class="nav-item active"><a class="nav-link" href="{% url 'home' %}">Home</a></li>
 							<li class="nav-item submenu dropdown">
 								<a href="#" class="nav-link dropdown-toggle" data-toggle="dropdown" role="button" aria-haspopup="true"
-								 aria-expanded="false">Shop</a>
+								 aria-expanded="false">Repuestos</a>
 								<ul class="dropdown-menu">
-									<li class="nav-item"><a class="nav-link" href="{% url 'category' %}">Shop Category</a></li>
-									<li class="nav-item"><a class="nav-link" href="{% url 'single_product' %}">Product Details</a></li>
-									<li class="nav-item"><a class="nav-link" href="{% url 'checkout' %}">Product Checkout</a></li>
-									<li class="nav-item"><a class="nav-link" href="{% url 'cart' %}">Shopping Cart</a></li>
-									<li class="nav-item {% if request.path == '/confirmation/' %}active{% endif %}"><a class="nav-link" href="{% url 'confirmation' %}">Confirmation</a></li>
+									<li class="nav-item"><a class="nav-link" href="{% url 'category' %}">Filtros de aire</a></li>
+									<li class="nav-item"><a class="nav-link" href="{% url 'single_product' %}">Filtros de aceite</a></li>
+									<li class="nav-item"><a class="nav-link" href="{% url 'checkout' %}">Bujias</a></li>
+									<li class="nav-item"><a class="nav-link" href="{% url 'cart' %}">Correas de distribucion</a></li>
 								</ul>
 							</li>
 							<li class="nav-item submenu dropdown">
 								<a href="#" class="nav-link dropdown-toggle" data-toggle="dropdown" role="button" aria-haspopup="true"
-								 aria-expanded="false">Blog</a>
+								 aria-expanded="false">Frenos y suspension</a>
 								<ul class="dropdown-menu">
+									<li class="nav-item"><a class="nav-link" href="{% url 'category' %}">Pastillas de freno</a></li>
+									<li class="nav-item"><a class="nav-link" href="{% url 'single_product' %}">Discos de freno</a></li>
+									<li class="nav-item"><a class="nav-link" href="{% url 'checkout' %}">Amortiguadores</a></li>
+									<li class="nav-item"><a class="nav-link" href="{% url 'cart' %}">Rótulas</a></li>
 									<li class="nav-item {% if request.path == '/blog/' %}active{% endif %}"><a class="nav-link" href="{% url 'blog' %}">Blog</a></li>
 									<li class="nav-item"><a class="nav-link" href="{% url 'single_blog' %}">Blog Details</a></li>
 								</ul>
 							</li>
 							<li class="nav-item submenu dropdown">
 								<a href="#" class="nav-link dropdown-toggle" data-toggle="dropdown" role="button" aria-haspopup="true"
-								 aria-expanded="false">Pages</a>
+								 aria-expanded="false">Electricidad y baterias</a>
 								<ul class="dropdown-menu">
+									<li class="nav-item"><a class="nav-link" href="{% url 'category' %}">Alternadores</a></li>
+									<li class="nav-item"><a class="nav-link" href="{% url 'single_product' %}">Baterias</a></li>
+									<li class="nav-item"><a class="nav-link" href="{% url 'checkout' %}">Luces y faros</a></li>
+									<li class="nav-item"><a class="nav-link" href="{% url 'cart' %}">Sensores y fusibles</a></li>
 									<li class="nav-item {% if request.path == '/login/' %}active{% endif %}"><a class="nav-link" href="{% url 'login' %}">Login</a></li>
 									<li class="nav-item"><a class="nav-link" href="{% url 'tracking' %}">Tracking</a></li>
+								</ul>
+							</li>
+							<li class="nav-item submenu dropdown">
+								<a href="#" class="nav-link dropdown-toggle" data-toggle="dropdown" role="button" aria-haspopup="true"
+								 aria-expanded="false">Accesorios y seguridad</a>
+								<ul class="dropdown-menu">
+									<li class="nav-item"><a class="nav-link" href="{% url 'category' %}">Alarmas</a></li>
+									<li class="nav-item"><a class="nav-link" href="{% url 'single_product' %}">Cinturones de seguridad</a></li>
+									<li class="nav-item"><a class="nav-link" href="{% url 'checkout' %}">Cubre asientos</a></li>
+									<li class="nav-item"><a class="nav-link" href="{% url 'cart' %}">Kits de emergencia</a></li>
 								</ul>
 							</li>
 							<li class="nav-item"><a class="nav-link" href="{% url 'contact' %}">Contact</a></li>
