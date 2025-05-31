@@ -1,0 +1,44 @@
+{% extends "tienda/base.html" %}
+{% load static %}
+
+{% block title %}Realizar Pedido{% endblock %}
+
+{% block content %}
+<div class="row justify-content-center">
+    <div class="col-md-6">
+        <h2 class="mb-4 mt-5 text-center">Realizar Pedido</h2>
+        <form method="post" class="shadow p-4 border rounded bg-white">
+            {% csrf_token %}
+
+            <div class="form-group">
+                <label for="id_cliente_id">ID Cliente</label>
+                <input type="number" name="cliente_id" class="form-control" id="id_cliente_id" required>
+            </div>
+
+            <div class="form-group">
+                <label for="id_tipo_entrega">Tipo de entrega</label>
+                <select name="tipo_entrega" class="form-control" id="id_tipo_entrega">
+                    <option value="retiro">Retiro en tienda</option>
+                    <option value="envio">Envío a domicilio</option>
+                </select>
+            </div>
+
+            <div class="form-group">
+                <label for="id_direccion_entrega">Dirección entrega</label>
+                <input type="text" name="direccion_entrega" class="form-control" id="id_direccion_entrega">
+            </div>
+
+            <input type="hidden" name="productos" id="productos">
+            <button type="submit" class="btn btn-primary btn-block">Enviar Pedido</button>
+        </form>
+    </div>
+</div>
+
+<script>
+    const productosSeleccionados = [
+        { "codigo_producto": "AP-12345", "cantidad": 2 },
+        { "codigo_producto": "AP-67890", "cantidad": 1 }
+    ];
+    document.getElementById('productos').value = JSON.stringify(productosSeleccionados);
+</script>
+{% endblock %}

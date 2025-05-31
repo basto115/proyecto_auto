@@ -1,6 +1,7 @@
 
 from django.urls import path
 from . import views
+from .views import realizar_pedido
 
 
 urlpatterns = [
@@ -15,4 +16,5 @@ urlpatterns = [
     path('login', views.login, name="login"),
     path('tracking', views.tracking, name="tracking"),
     path('contact', views.contact, name="contact"),
+    path('realizar-pedido/', realizar_pedido, name='realizar_pedido'),
 ]
