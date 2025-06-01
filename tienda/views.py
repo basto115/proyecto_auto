@@ -7,7 +7,8 @@ from .forms import PedidoForm
 from django.shortcuts import render, get_object_or_404, redirect
 from django.http import HttpResponse
 from .models import Producto, Categoria
-
+import json
+from django.contrib.auth import authenticate, login
 # Create your views here.
 
 def home(request):
@@ -88,29 +89,66 @@ def contact(request):
 
 
 def realizar_pedido(request):
-    if request.method == 'POST':
-        form = PedidoForm(request.POST)
-        if form.is_valid():
-            data = {
-                "cliente_id": form.cleaned_data['cliente_id'],
-                "productos": eval(form.cleaned_data['productos']),  # debería venir como JSON string
-                "tipo_entrega": form.cleaned_data['tipo_entrega'],
-                "direccion_entrega": form.cleaned_data['direccion_entrega'],
-            }
-            try:
-                response = requests.post(
-                    'http://localhost:8000/api/orders',
-                    json=data,
-                    headers={'Authorization': f'Bearer {request.session.get("token")}'}
-                )
-                if response.status_code == 200 or response.status_code == 201:
-                    messages.success(request, 'Pedido realizado con éxito.')
-                    return redirect('catalogo')  # o cualquier vista que quieras
-                else:
-                    messages.error(request, f'Error: {response.status_code} - {response.text}')
-            except Exception as e:
-                messages.error(request, f'Error al contactar la API: {str(e)}')
-    else:
-        form = PedidoForm()
+    productos_json = "[]"
+    carrito = request.session.get("carrito", {})
 
-    return render(request, 'tienda/realizar_pedido.html', {'form': form})
+    # Convertir los productos del carrito en JSON compatible con la API
+    if carrito:
+        productos_json = json.dumps([
+            {
+                "codigo_producto": item.get("codigo", ""),
+                "cantidad": item.get("cantidad", 1)
+            }
+            for item in carrito.values()
+        ])
+
+    # Si se envía el formulario (POST)
+    if request.method == 'POST':
+        cliente_id = request.POST.get('cliente_id')
+        tipo_entrega = request.POST.get('tipo_entrega')
+        direccion = request.POST.get('direccion_entrega')
+        productos = request.POST.get('productos')
+
+        data = {
+            "cliente_id": int(cliente_id),
+            "productos": json.loads(productos),
+            "tipo_entrega": tipo_entrega,
+            "direccion_entrega": direccion
+        }
+
+        try:
+            response = requests.post(
+                'http://localhost:8000/api/orders',
+                json=data,
+                headers={'Authorization': f'Bearer {request.session.get("token", "")}'}
+            )
+            if response.status_code in [200, 201]:
+                # Vaciar carrito después de pedido exitoso
+                request.session['carrito'] = {}
+                messages.success(request, 'Pedido realizado con éxito.')
+                return redirect('catalogo')
+            else:
+                messages.error(request, f"Error al registrar pedido: {response.status_code} - {response.text}")
+        except Exception as e:
+            messages.error(request, f"Error al conectar con la API: {str(e)}")
+
+    return render(request, 'tienda/realizar_pedido.html', {
+        'productos_json': productos_json,
+    })
+
+
+def login_view(request):
+    if request.method == 'POST':
+        email = request.POST.get('email')
+        password = request.POST.get('password')
+
+        # Importante: si estás usando email como username
+        user = authenticate(request, username=email, password=password)
+
+        if user is not None:
+            login(request, user)
+            return redirect('home')  # Redirige a donde quieras después de iniciar sesión
+        else:
+            messages.error(request, 'Correo o contraseña incorrectos.')
+
+    return render(request, 'tienda/login.html')
