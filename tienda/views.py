@@ -12,8 +12,7 @@ import mercadopago
 from django.conf import settings
 from django.contrib.auth.decorators import login_required
 import json
-from django.contrib.auth import authenticate, login, get_user_model
-
+from django.contrib.auth import authenticate, login, get_user_model,logout
 
 # Create your views here.
 
@@ -123,8 +122,6 @@ def blog(request):
 def single_blog(request):
     return render(request, 'tienda/single_blog.html')
 
-def login(request):
-    return render(request, 'tienda/login.html')
 
 def tracking(request):
     return render(request, 'tienda/tracking.html')
@@ -272,3 +269,7 @@ def register_view(request):
             return redirect('login')
 
     return render(request, 'tienda/register.html')
+
+def logout_view(request):
+    logout(request)
+    return redirect('home')  # O donde quieras redirigir
