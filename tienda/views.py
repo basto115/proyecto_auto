@@ -287,18 +287,26 @@ def register_view(request):
         email = request.POST['email']
         password1 = request.POST['password1']
         password2 = request.POST['password2']
+        is_b2b_raw = request.POST.get('is_b2b', 'false')
+        is_b2b = True if is_b2b_raw == 'true' else False
 
         if password1 != password2:
             messages.error(request, "Las contraseñas no coinciden.")
         elif User.objects.filter(email=email).exists():
             messages.error(request, "Este email ya está registrado.")
         else:
-            user = User.objects.create_user(username=email, email=email, password=password1)
-            login(request, user)  # inicia sesión automáticamente
-            return redirect('home')  # redirige al home
-
+            user = User.objects.create_user(
+                username=email,
+                email=email,
+                password=password1
+            )
+            user.is_b2b = is_b2b
+            user.save()
+            login(request, user)
+            return redirect('home')
 
     return render(request, 'tienda/register.html')
+
 
 
 def logout_view(request):
