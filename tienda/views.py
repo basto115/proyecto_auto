@@ -207,7 +207,7 @@ def realizar_pedido(request):
 
     # Si se envía el formulario (POST)
     if request.method == 'POST':
-        cliente_id = request.POST.get('cliente_id')
+        cliente_id = request.user.id
         tipo_entrega = request.POST.get('tipo_entrega')
         direccion = request.POST.get('direccion_entrega')
         productos = request.POST.get('productos')
