@@ -1,7 +1,7 @@
 
 from django.urls import path
 from . import views
-from .views import realizar_pedido, login_view, register_view
+from .views import realizar_pedido, login_view, register_view, logout_view
 
 urlpatterns = [
     path('', views.home, name="home"),
@@ -31,6 +31,8 @@ urlpatterns = [
     # Repartidor
     path('pedidos/repartidor/', views.pedidos_repartidor, name='pedidos_repartidor'),
     path('pedidos/repartidor/<int:pedido_id>/entregado/', views.marcar_entregado, name='marcar_entregado'),
+    path('logout/', logout_view, name='logout'),
+
     
     path('producto/<int:producto_id>/', views.detalle_producto, name='detalle_producto'),
     path('<str:seccion>/', views.catalogo_por_seccion, name='catalogo_por_seccion'),
