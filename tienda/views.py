@@ -294,8 +294,9 @@ def register_view(request):
             messages.error(request, "Este email ya está registrado.")
         else:
             user = User.objects.create_user(username=email, email=email, password=password1)
-            messages.success(request, "Cuenta creada. Ahora puedes iniciar sesión.")
-            return redirect('login')
+            login(request, user)  # inicia sesión automáticamente
+            return redirect('home')  # redirige al home
+
 
     return render(request, 'tienda/register.html')
 
