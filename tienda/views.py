@@ -7,6 +7,9 @@ from .forms import PedidoForm
 from django.shortcuts import render, get_object_or_404, redirect
 from django.http import HttpResponse
 from .models import Producto, Categoria
+from django.urls import reverse
+import mercadopago
+from django.conf import settings
 
 # Create your views here.
 
@@ -47,7 +50,12 @@ def agregar_producto(request, producto_id):
 
 def ver_carrito(request):
     carrito = request.session.get('carrito', {})
-    total = sum(item['precio'] * item['cantidad'] for item in carrito.values())
+    total = 0
+
+    for id, item in carrito.items():
+        item['subtotal'] = item['precio'] * item['cantidad']
+        total += item['subtotal']
+
     return render(request, 'tienda/carrito.html', {'carrito': carrito, 'total': total})
 
 def eliminar_producto(request, producto_id):
@@ -61,10 +69,50 @@ def vaciar_carrito(request):
     return redirect('ver_carrito')
 
 def checkout(request):
-    return render(request, 'tienda/checkout.html')
+    carrito = request.session.get('carrito', {})
+    if not carrito:
+        return redirect('ver_carrito')
 
-def confirmation(request):
-    return render(request, 'tienda/confirmation.html')
+    preference_items = []
+    for id, item in carrito.items():
+        preference_items.append({
+            "title": item['nombre'],
+            "quantity": int(item['cantidad']),
+            "currency_id": "CLP",
+            "unit_price": float(item['precio']),
+        })
+
+    sdk = mercadopago.SDK(settings.MERCADO_PAGO_ACCESS_TOKEN)
+
+    # 🔽 Aquí va tu bloque preference_data:
+    preference_data = {
+        "items": preference_items,
+        "back_urls": {
+            "success": request.build_absolute_uri(reverse('confirmacion_pago')),
+            "failure": request.build_absolute_uri(reverse('ver_carrito')),
+            "pending": request.build_absolute_uri(reverse('ver_carrito')),
+        },
+        #"auto_return": "approved"
+    }
+
+    # Crear preferencia
+    preference_response = sdk.preference().create(preference_data)
+    response_data = preference_response.get("response", {})
+
+    if "init_point" in response_data:
+        return render(request, 'tienda/checkout.html', {
+        'carrito': carrito,
+        'init_point': response_data["init_point"],
+        'preference_id': response_data.get("id")
+    })
+    else:
+        error = response_data.get("message", "No se pudo generar la preferencia de pago.")
+        return render(request, 'tienda/checkout_error.html', {"error": error, "detalles": response_data})
+
+def confirmacion_pago(request):
+    request.session['carrito'] = {}  
+    return render(request, 'tienda/confirmacion.html')
+
 
 def single_product(request, producto_id):
     producto = Producto.objects.get(id=producto_id)

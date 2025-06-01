@@ -23,16 +23,15 @@
                     <td>{{ item.nombre }}</td>
                     <td>${{ item.precio }}</td>
                     <td>{{ item.cantidad }}</td>
-                    <td>${{ item.precio|floatformat:0|add:"0"|floatformat:2|floatformat:""|add:item.cantidad }}</td>
-                    <td>
-                        <a href="{% url 'eliminar_producto' id %}" class="btn btn-danger btn-sm">Eliminar</a>
-                    </td>
+                    <td>${{ item.subtotal|floatformat:0 }}</td>
+                    <td><a href="{% url 'eliminar_producto' id %}" class="btn btn-danger btn-sm">Eliminar</a></td>
                 </tr>
                 {% endfor %}
             </tbody>
         </table>
         <h4 class="text-right">Total: ${{ total }}</h4>
         <a href="{% url 'vaciar_carrito' %}" class="btn btn-warning">Vaciar carrito</a>
+        <a href="{% url 'checkout' %}" class="btn btn-primary mt-3">Pagar con Mercado Pago</a>
     {% else %}
         <p>No tienes productos en el carrito.</p>
     {% endif %}

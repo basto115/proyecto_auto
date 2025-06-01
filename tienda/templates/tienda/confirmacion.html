@@ -1,0 +1,8 @@
+{% extends "tienda/base.html" %}
+{% block content %}
+<div class="container mt-5 text-center">
+    <h2>¡Gracias por tu compra!</h2>
+    <p>Tu pago fue recibido correctamente.</p>
+    <a href="{% url 'catalogo' %}" class="btn btn-primary mt-3">Seguir comprando</a>
+</div>
+{% endblock %}
