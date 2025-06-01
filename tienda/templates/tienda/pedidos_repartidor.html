@@ -1,0 +1,38 @@
+{% extends "tienda/base.html" %}
+{% block title %}Pedidos - Repartidor{% endblock %}
+
+{% block content %}
+<div class="container mt-5">
+    <h2>Pedidos Listos para Reparto</h2>
+    <table class="table table-striped">
+        <thead>
+            <tr>
+                <th>ID Pedido</th>
+                <th>Cliente</th>
+                <th>Tipo Entrega</th>
+                <th>Dirección</th>
+                <th>Estado</th>
+                <th>Acción</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for pedido in pedidos %}
+            <tr>
+                <td>{{ pedido.id }}</td>
+                <td>{{ pedido.cliente.get_full_name }}</td>
+                <td>{{ pedido.tipo_entrega }}</td>
+                <td>{{ pedido.direccion_entrega }}</td>
+                <td>{{ pedido.estado }}</td>
+                <td>
+                    <a href="{% url 'marcar_entregado' pedido.id %}" class="btn btn-primary btn-sm">
+                        Marcar como Entregado
+                    </a>
+                </td>
+            </tr>
+            {% empty %}
+            <tr><td colspan="6">No hay pedidos listos para reparto.</td></tr>
+            {% endfor %}
+        </tbody>
+    </table>
+</div>
+{% endblock %}

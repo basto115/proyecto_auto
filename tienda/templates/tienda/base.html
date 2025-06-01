@@ -19,6 +19,16 @@
     <link rel="stylesheet" href="{% static 'css/ion.rangeSlider.skinFlat.css' %}" />
     <link rel="stylesheet" href="{% static 'css/magnific-popup.css' %}">
     <link rel="stylesheet" href="{% static 'css/main.css' %}">
+
+    <style>
+        body {
+            padding-top: 120px; /* ajusta este valor según el alto real de tu navbar */
+        }
+
+        .alert {
+            margin-top: 20px;
+        }
+    </style>    
 </head>
 
 <body>
@@ -64,7 +74,6 @@
                                     <li class="nav-item"><a class="nav-link" href="{% url 'ver_carrito' %}">Rótulas</a></li>
                                     <li class="nav-item {% if request.path == '/blog/' %}active{% endif %}">
                                         <a class="nav-link" href="{% url 'blog' %}">Blog</a></li>
-                                    <li class="nav-item"><a class="nav-link" href="{% url 'single_blog' %}">Blog Details</a></li>
                                 </ul>
                             </li>
 
@@ -108,6 +117,17 @@
         </div>
     </header>
 
+    <!-- Contenido dinámico -->
+    <main class="container mt-5">
+            {% if messages %}
+            <div class="container" style="margin-top: 100px;">
+                {% for message in messages %}
+                <div class="alert alert-success" role="alert">
+                    {{ message }}
+                </div>
+                {% endfor %}
+            </div>
+            {% endif %}
     
     {% if messages %}
         <div class="container mt-3">
