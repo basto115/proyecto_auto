@@ -39,11 +39,12 @@ class ProductoSerializer(serializers.ModelSerializer):
         fields = '__all__'
         
 class PedidoProductoSerializer(serializers.ModelSerializer):
-    producto = ProductoSerializer()
+    producto_nombre = serializers.CharField(source='producto.nombre', read_only=True)
+    producto_codigo = serializers.CharField(source='producto.codigo_producto', read_only=True)
 
     class Meta:
         model = PedidoProducto
-        fields = ['producto', 'cantidad']
+        fields = ['producto_nombre', 'producto_codigo', 'cantidad']
         
 class PedidoSerializer(serializers.ModelSerializer):
     productos = serializers.SerializerMethodField()
@@ -55,3 +56,14 @@ class PedidoSerializer(serializers.ModelSerializer):
     def get_productos(self, obj):
         productos = PedidoProducto.objects.filter(pedido=obj).select_related('producto')
         return PedidoProductoSerializer(productos, many=True).data
+
+class PedidoHistorialSerializer(serializers.ModelSerializer):
+    productos = serializers.SerializerMethodField()
+
+    class Meta:
+        model = Pedido
+        fields = ['id', 'fecha_creacion', 'estado', 'tipo_entrega', 'direccion_entrega', 'productos']
+
+    def get_productos(self, obj):
+        items = PedidoProducto.objects.filter(pedido=obj)
+        return PedidoProductoSerializer(items, many=True).data

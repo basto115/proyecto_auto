@@ -1,6 +1,6 @@
 from django.shortcuts import render, redirect
 from django.http import HttpResponse
-from .models import Producto, Pedido, PedidoProducto
+from .models import Producto, Pedido, PedidoProducto, CustomUser
 import requests
 from django.contrib import messages
 from .forms import PedidoForm
@@ -16,8 +16,8 @@ from django.contrib.auth import authenticate, login, get_user_model,logout
 from rest_framework.views import APIView
 from rest_framework.response import Response
 from rest_framework import status
-from .serializers import CustomUserRegisterSerializer, ProductoSerializer, PedidoSerializer
-
+from .serializers import CustomUserRegisterSerializer, ProductoSerializer, PedidoSerializer, PedidoHistorialSerializer
+from rest_framework.generics import RetrieveAPIView
 # Create your views here.
 
 def home(request):
@@ -343,9 +343,110 @@ class ProductoDetailView(APIView):
         except Producto.DoesNotExist:
             return Response({'error': 'Producto no encontrado'}, status=status.HTTP_404_NOT_FOUND)
 
+
 class PedidosPorUsuarioView(APIView):
     def get(self, request, user_id):
         pedidos = Pedido.objects.filter(cliente_id=user_id).order_by('-fecha_creacion')
         serializer = PedidoSerializer(pedidos, many=True)
         return Response(serializer.data)
 
+class CrearPedidoPorEmailView(APIView):
+    def post(self, request):
+        email = request.data.get('email')
+        productos = request.data.get('productos', [])
+        tipo_entrega = request.data.get('tipo_entrega')
+        direccion_entrega = request.data.get('direccion_entrega', '')
+
+        if not email or not productos or not tipo_entrega:
+            return Response({'error': 'Faltan datos obligatorios'}, status=status.HTTP_400_BAD_REQUEST)
+
+        try:
+            cliente = CustomUser.objects.get(email=email)
+        except CustomUser.DoesNotExist:
+            return Response({'error': 'Cliente no encontrado'}, status=status.HTTP_404_NOT_FOUND)
+
+        pedido = Pedido.objects.create(
+            cliente=cliente,
+            tipo_entrega=tipo_entrega,
+            direccion_entrega=direccion_entrega
+        )
+
+        for item in productos:
+            producto_id = item.get('id')
+            cantidad = item.get('cantidad', 1)
+            try:
+                producto = Producto.objects.get(id=producto_id)
+                PedidoProducto.objects.create(pedido=pedido, producto=producto, cantidad=cantidad)
+            except Producto.DoesNotExist:
+                continue
+
+        return Response({'mensaje': 'Pedido creado exitosamente', 'pedido_id': pedido.id}, status=status.HTTP_201_CREATED)
+
+class CrearPedidoPorIDView(APIView):
+    def post(self, request):
+        data = request.data
+
+        try:
+            cliente = get_object_or_404(CustomUser, id=data.get("cliente_id"))
+            tipo_entrega = data.get("tipo_entrega")
+            direccion_entrega = data.get("direccion_entrega", "No especificado")
+            productos = data.get("productos", [])
+
+            if not productos:
+                return Response({"error": "No se han enviado productos"}, status=status.HTTP_400_BAD_REQUEST)
+
+            pedido = Pedido.objects.create(
+                cliente=cliente,
+                tipo_entrega=tipo_entrega,
+                direccion_entrega=direccion_entrega
+            )
+
+            for item in productos:
+                codigo = item.get("codigo_producto")
+                cantidad = item.get("cantidad", 1)
+                producto = Producto.objects.filter(codigo_producto=codigo).first()
+
+                if producto:
+                    PedidoProducto.objects.create(pedido=pedido, producto=producto, cantidad=cantidad)
+                else:
+                    pedido.delete()
+                    return Response({"error": f"Producto con código {codigo} no encontrado"}, status=status.HTTP_400_BAD_REQUEST)
+
+            return Response({"mensaje": "Pedido creado correctamente", "pedido_id": pedido.id}, status=status.HTTP_201_CREATED)
+
+        except Exception as e:
+            return Response({"error": str(e)}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
+
+class ProductoDetalleView(RetrieveAPIView):
+    queryset = Producto.objects.all()
+    serializer_class = ProductoSerializer
+    lookup_field = 'id'
+    
+class HistorialPedidosView(APIView):
+    def get(self, request):
+        email = request.query_params.get('email')
+        if not email:
+            return Response({'error': 'Se requiere el email del usuario'}, status=status.HTTP_400_BAD_REQUEST)
+
+        try:
+            user = CustomUser.objects.get(email=email)
+            pedidos = Pedido.objects.filter(cliente=user).order_by('-fecha_creacion')
+            serializer = PedidoHistorialSerializer(pedidos, many=True)
+            return Response(serializer.data, status=status.HTTP_200_OK)
+        except CustomUser.DoesNotExist:
+            return Response({'error': 'Usuario no encontrado'}, status=status.HTTP_404_NOT_FOUND)
+
+class ActualizarEstadoPedidoView(APIView):
+    def put(self, request, pedido_id):
+        nuevo_estado = request.data.get('estado')
+
+        if not nuevo_estado:
+            return Response({'error': 'Debe proporcionar el nuevo estado'}, status=status.HTTP_400_BAD_REQUEST)
+
+        try:
+            pedido = Pedido.objects.get(id=pedido_id)
+            pedido.estado = nuevo_estado
+            pedido.save()
+            return Response({'mensaje': f'Estado del pedido actualizado a "{nuevo_estado}"'}, status=status.HTTP_200_OK)
+        except Pedido.DoesNotExist:
+            return Response({'error': 'Pedido no encontrado'}, status=status.HTTP_404_NOT_FOUND)

@@ -1,8 +1,8 @@
 
 from django.urls import path
 from . import views
-from .views import realizar_pedido, login_view, register_view, logout_view, RegisterUserView, ProductoDetailView, PedidosPorUsuarioView
-
+from .views import realizar_pedido, login_view, register_view, logout_view, RegisterUserView, ProductoDetailView, PedidosPorUsuarioView, CrearPedidoPorEmailView, CrearPedidoPorIDView
+from .views import ProductoDetalleView, HistorialPedidosView, ActualizarEstadoPedidoView
 
 urlpatterns = [
     path('', views.home, name="home"),
@@ -39,8 +39,14 @@ urlpatterns = [
     path('<str:seccion>/', views.catalogo_por_seccion, name='catalogo_por_seccion'),
     
     path('api/register/', RegisterUserView.as_view(), name='api_register_user'),
-    path('api/productos/<int:id>/', ProductoDetailView.as_view(), name='producto-detalle'),
+    path('api/products/<int:id>/', ProductoDetailView.as_view(), name='producto_detail'),
     path('api/pedidos/usuario/<int:user_id>/', PedidosPorUsuarioView.as_view(), name='pedidos_usuario'),
+    path('api/orders/', CrearPedidoPorIDView.as_view()),
+    path('api/pedidos/crear/', CrearPedidoPorEmailView.as_view()),
+    path('api/products/<int:id>/', ProductoDetalleView.as_view(), name='producto_detalle'),
+    path('api/pedidos/historial/', HistorialPedidosView.as_view(), name='historial_pedidos'),
+    path('api/pedidos/<int:pedido_id>/actualizar_estado/', ActualizarEstadoPedidoView.as_view(), name='actualizar_estado_pedido'),
+    
 ]
 
 # se habian duplicado los urls lol

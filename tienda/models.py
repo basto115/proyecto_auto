@@ -3,7 +3,7 @@
 from django.contrib.auth.models import AbstractUser
 from django.db import models
 from django.utils import timezone
-
+from django.core.validators import FileExtensionValidator
 
 # Modelo de Usuario (CustomUser)
 class CustomUser(AbstractUser):
@@ -66,16 +66,22 @@ class Pedido(models.Model):
         ('entregado', 'Entregado'),
     ]
     
-    cliente = models.ForeignKey(CustomUser, on_delete=models.CASCADE)  # Relación con el cliente (usuario)
+    cliente = models.ForeignKey(CustomUser, on_delete=models.CASCADE)
     tipo_entrega = models.CharField(max_length=50, choices=[('retiro', 'Retiro'), ('domicilio', 'Domicilio')])
-    direccion_entrega = models.CharField(max_length=255, blank=True, null=True, default="No especificado")  # Valor predeterminado
+    direccion_entrega = models.CharField(max_length=255, blank=True, null=True, default="No especificado")
     fecha_creacion = models.DateTimeField(auto_now_add=True)
-    
     estado = models.CharField(max_length=20, choices=ESTADOS_PEDIDO, default='pendiente')
+
+    # ✅ Campo para subir comprobante de transferencia
+    comprobante_transferencia = models.FileField(
+        upload_to='comprobantes/',
+        null=True,
+        blank=True,
+        validators=[FileExtensionValidator(allowed_extensions=['pdf', 'jpg', 'jpeg', 'png'])]
+    )
 
     def __str__(self):
         return f"Pedido #{self.id} - {self.cliente} - {self.estado}"
-
 
 # Modelo de PedidoProducto (pedidos_pedidoproducto)
 class PedidoProducto(models.Model):
@@ -85,3 +91,4 @@ class PedidoProducto(models.Model):
 
     def __str__(self):
         return f"{self.producto.nombre} - {self.cantidad} unidades"
+
