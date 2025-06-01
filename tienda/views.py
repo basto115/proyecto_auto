@@ -16,8 +16,9 @@ from django.contrib.auth import authenticate, login, get_user_model,logout
 from rest_framework.views import APIView
 from rest_framework.response import Response
 from rest_framework import status
-from .serializers import CustomUserRegisterSerializer, ProductoSerializer, PedidoSerializer, PedidoHistorialSerializer
+from .serializers import CustomUserRegisterSerializer, ProductoSerializer, PedidoSerializer, PedidoHistorialSerializer, ComprobanteTransferenciaSerializer
 from rest_framework.generics import RetrieveAPIView
+from rest_framework.parsers import MultiPartParser, FormParser
 # Create your views here.
 
 def home(request):
@@ -450,3 +451,44 @@ class ActualizarEstadoPedidoView(APIView):
             return Response({'mensaje': f'Estado del pedido actualizado a "{nuevo_estado}"'}, status=status.HTTP_200_OK)
         except Pedido.DoesNotExist:
             return Response({'error': 'Pedido no encontrado'}, status=status.HTTP_404_NOT_FOUND)
+
+class SubirComprobanteView(APIView):
+    parser_classes = [MultiPartParser, FormParser]
+
+    def post(self, request, pedido_id):
+        try:
+            pedido = Pedido.objects.get(id=pedido_id)
+        except Pedido.DoesNotExist:
+            return Response({"error": "Pedido no encontrado"}, status=status.HTTP_404_NOT_FOUND)
+
+        serializer = ComprobanteTransferenciaSerializer(pedido, data=request.data, partial=True)
+        if serializer.is_valid():
+            serializer.save()
+            return Response({"mensaje": "Comprobante subido correctamente"}, status=status.HTTP_200_OK)
+        return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+    
+class PedidosPendientesView(APIView):
+    def get(self, request):
+        pedidos = Pedido.objects.filter(estado="pendiente").order_by("-fecha_creacion")
+        data = []
+
+        for pedido in pedidos:
+            productos = PedidoProducto.objects.filter(pedido=pedido)
+            productos_info = [
+                {
+                    "producto": prod.producto.nombre,
+                    "cantidad": prod.cantidad
+                } for prod in productos
+            ]
+
+            data.append({
+                "pedido_id": pedido.id,
+                "cliente": pedido.cliente.email,
+                "tipo_entrega": pedido.tipo_entrega,
+                "direccion_entrega": pedido.direccion_entrega,
+                "fecha_creacion": pedido.fecha_creacion,
+                "productos": productos_info
+            })
+
+        return Response(data, status=status.HTTP_200_OK)
+    

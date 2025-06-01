@@ -2,7 +2,7 @@
 from django.urls import path
 from . import views
 from .views import realizar_pedido, login_view, register_view, logout_view, RegisterUserView, ProductoDetailView, PedidosPorUsuarioView, CrearPedidoPorEmailView, CrearPedidoPorIDView
-from .views import ProductoDetalleView, HistorialPedidosView, ActualizarEstadoPedidoView
+from .views import ProductoDetalleView, HistorialPedidosView, ActualizarEstadoPedidoView, SubirComprobanteView, PedidosPendientesView
 
 urlpatterns = [
     path('', views.home, name="home"),
@@ -46,6 +46,8 @@ urlpatterns = [
     path('api/products/<int:id>/', ProductoDetalleView.as_view(), name='producto_detalle'),
     path('api/pedidos/historial/', HistorialPedidosView.as_view(), name='historial_pedidos'),
     path('api/pedidos/<int:pedido_id>/actualizar_estado/', ActualizarEstadoPedidoView.as_view(), name='actualizar_estado_pedido'),
+    path('api/pedidos/<int:pedido_id>/subir_comprobante/', SubirComprobanteView.as_view(), name='subir_comprobante'),
+    path('api/pedidos/pendientes/', PedidosPendientesView.as_view(), name='pedidos_pendientes'),
     
 ]
 
