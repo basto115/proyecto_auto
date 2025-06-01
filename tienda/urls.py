@@ -2,7 +2,7 @@
 from django.urls import path
 from . import views
 from .views import realizar_pedido
-from .views import login_view
+from .views import login_view, register_view
 
 
 urlpatterns = [
@@ -21,4 +21,5 @@ urlpatterns = [
     path('agregar/<int:producto_id>/', views.agregar_producto, name='agregar_producto'),
     path('eliminar/<int:producto_id>/', views.eliminar_producto, name='eliminar_producto'),
     path('vaciar/', views.vaciar_carrito, name='vaciar_carrito'),
+    path('register/', register_view, name='register'),
 ]
