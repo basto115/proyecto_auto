@@ -35,10 +35,8 @@
 </div>
 
 <script>
-    const productosSeleccionados = [
-        { "codigo_producto": "AP-12345", "cantidad": 2 },
-        { "codigo_producto": "AP-67890", "cantidad": 1 }
-    ];
+    const productosSeleccionados = JSON.parse('{{ productos_json|escapejs }}');
     document.getElementById('productos').value = JSON.stringify(productosSeleccionados);
 </script>
+
 {% endblock %}

@@ -1,9 +1,0 @@
-{% extends "tienda/base.html" %}
-{% block content %}
-<div class="container mt-5 text-center">
-    <h2>Error al generar el pago</h2>
-    <p>{{ error }}</p>
-    <pre>{{ detalles }}</pre>
-    <a href="{% url 'ver_carrito' %}" class="btn btn-secondary mt-3">Volver al carrito</a>
-</div>
-{% endblock %}

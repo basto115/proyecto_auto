@@ -8,25 +8,18 @@ from django.utils import timezone
 # Modelo de Usuario (CustomUser)
 class CustomUser(AbstractUser):
     email = models.EmailField(unique=True)
-    is_b2b = models.BooleanField(default=False)  # True si es cliente B2B
-    date_joined = models.DateTimeField(auto_now_add=True)  # Fecha de creación del usuario
+    is_b2b = models.BooleanField(default=False)
+    date_joined = models.DateTimeField(auto_now_add=True)
 
-    # Relacionar los grupos con un related_name único
-    groups = models.ManyToManyField(
-        'auth.Group',
-        related_name='customuser_groups',  # Cambiado para evitar conflicto
-        blank=True
-    )
+    USERNAME_FIELD = 'email'
+    REQUIRED_FIELDS = []
 
-    # Relacionar los permisos con un related_name único
-    user_permissions = models.ManyToManyField(
-        'auth.Permission',
-        related_name='customuser_permissions',  # Cambiado para evitar conflicto
-        blank=True
-    )
+    groups = models.ManyToManyField('auth.Group', related_name='customuser_groups', blank=True)
+    user_permissions = models.ManyToManyField('auth.Permission', related_name='customuser_permissions', blank=True)
 
     def __str__(self):
         return self.email
+
 
 class Categoria(models.Model):
     nombre = models.CharField(max_length=100)

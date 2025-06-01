@@ -19,7 +19,6 @@
     <link rel="stylesheet" href="{% static 'css/ion.rangeSlider.skinFlat.css' %}" />
     <link rel="stylesheet" href="{% static 'css/magnific-popup.css' %}">
     <link rel="stylesheet" href="{% static 'css/main.css' %}">
-    <link rel="stylesheet" href="{% static 'css/main.css' %}">
 </head>
 
 <body>
@@ -107,6 +106,7 @@
             </nav>
         </div>
     </header>
+
     <!-- Contenido dinámico -->
     <main class="container mt-5">
             {% if messages %}
@@ -118,6 +118,22 @@
                 {% endfor %}
             </div>
             {% endif %}
+    
+    {% if messages %}
+        <div class="container mt-3">
+            {% for message in messages %}
+            <div class="alert alert-{{ message.tags }} alert-dismissible fade show" role="alert">
+                {{ message }}
+                <button type="button" class="close" data-dismiss="alert" aria-label="Close">
+                <span aria-hidden="true">&times;</span>
+                </button>
+            </div>
+            {% endfor %}
+        </div>
+    {% endif %}
+
+    <!-- Contenido dinámico -->
+    <main class="container mt-4">
         {% block content %}
         {% endblock %}
     </main>
