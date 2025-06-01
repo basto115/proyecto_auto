@@ -136,7 +136,8 @@ def contact(request):
 def realizar_pedido(request):
     productos_json = "[]"
     carrito = request.session.get("carrito", {})
-    return render(request, 'tienda/realizar_pedido.html', {'form': form})
+    return render(request, 'tienda/realizar_pedido.html', {'productos_json': productos_json})
+
 
 @login_required
 def pedidos_bodeguero(request):
