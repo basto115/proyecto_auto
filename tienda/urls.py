@@ -1,7 +1,8 @@
 
 from django.urls import path
 from . import views
-from .views import realizar_pedido, login_view, register_view, logout_view
+from .views import realizar_pedido, login_view, register_view, logout_view, RegisterUserView, ProductoDetailView, PedidosPorUsuarioView
+
 
 urlpatterns = [
     path('', views.home, name="home"),
@@ -36,6 +37,10 @@ urlpatterns = [
     
     path('producto/<int:producto_id>/', views.detalle_producto, name='detalle_producto'),
     path('<str:seccion>/', views.catalogo_por_seccion, name='catalogo_por_seccion'),
+    
+    path('api/register/', RegisterUserView.as_view(), name='api_register_user'),
+    path('api/productos/<int:id>/', ProductoDetailView.as_view(), name='producto-detalle'),
+    path('api/pedidos/usuario/<int:user_id>/', PedidosPorUsuarioView.as_view(), name='pedidos_usuario'),
 ]
 
 # se habian duplicado los urls lol

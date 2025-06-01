@@ -1,6 +1,6 @@
 from django.shortcuts import render, redirect
 from django.http import HttpResponse
-from .models import Producto, Pedido
+from .models import Producto, Pedido, PedidoProducto
 import requests
 from django.contrib import messages
 from .forms import PedidoForm
@@ -13,6 +13,10 @@ from django.conf import settings
 from django.contrib.auth.decorators import login_required
 import json
 from django.contrib.auth import authenticate, login, get_user_model,logout
+from rest_framework.views import APIView
+from rest_framework.response import Response
+from rest_framework import status
+from .serializers import CustomUserRegisterSerializer, ProductoSerializer, PedidoSerializer
 
 # Create your views here.
 
@@ -321,4 +325,27 @@ def register_view(request):
 def logout_view(request):
     logout(request)
     return redirect('home')  # O donde quieras redirigir
+
+class RegisterUserView(APIView):
+    def post(self, request):
+        serializer = CustomUserRegisterSerializer(data=request.data)
+        if serializer.is_valid():
+            user = serializer.save()
+            return Response({'message': 'Usuario registrado correctamente.'}, status=status.HTTP_201_CREATED)
+        return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+    
+class ProductoDetailView(APIView):
+    def get(self, request, id):
+        try:
+            producto = Producto.objects.get(id=id)
+            serializer = ProductoSerializer(producto)
+            return Response(serializer.data)
+        except Producto.DoesNotExist:
+            return Response({'error': 'Producto no encontrado'}, status=status.HTTP_404_NOT_FOUND)
+
+class PedidosPorUsuarioView(APIView):
+    def get(self, request, user_id):
+        pedidos = Pedido.objects.filter(cliente_id=user_id).order_by('-fecha_creacion')
+        serializer = PedidoSerializer(pedidos, many=True)
+        return Response(serializer.data)
 
