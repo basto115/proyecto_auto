@@ -185,6 +185,10 @@ def marcar_entregado(request, pedido_id):
 def detalle_producto(request, producto_id):
     producto = get_object_or_404(Producto, id=producto_id)
     return render(request, 'tienda/detalle_producto.html', {'producto': producto})
+
+def realizar_pedido(request):
+    productos_json = "[]"
+    carrito = request.session.get("carrito", {})
     # Convertir los productos del carrito en JSON compatible con la API
     if carrito:
         productos_json = json.dumps([

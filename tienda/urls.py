@@ -12,7 +12,6 @@ urlpatterns = [
     path('login', views.login, name="login"),
     path('checkout', views.checkout, name="checkout"),
     path('confirmation', views.confirmation, name="confirmation"),
-    path('producto/<int:producto_id>/', views.single_product, name='single_product'),
     path('blog', views.blog, name="blog"),
     path('single_blog', views.single_blog, name="single_blog"),
     path('login/', login_view, name="login"),
