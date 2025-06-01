@@ -295,4 +295,3 @@ def register_view(request):
             return redirect('login')
 
     return render(request, 'tienda/register.html')
-
