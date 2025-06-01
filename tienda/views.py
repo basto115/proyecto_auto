@@ -55,7 +55,13 @@ def agregar_producto(request, producto_id):
 
 def ver_carrito(request):
     carrito = request.session.get('carrito', {})
-    total = sum(item['precio'] * item['cantidad'] for item in carrito.values())
+
+    # Calculamos subtotal por producto
+    for item in carrito.values():
+        item['subtotal'] = item['precio'] * item['cantidad']
+
+    total = sum(item['subtotal'] for item in carrito.values())
+
     return render(request, 'tienda/carrito.html', {'carrito': carrito, 'total': total})
 
 def eliminar_producto(request, producto_id):
@@ -295,3 +301,4 @@ def register_view(request):
             return redirect('login')
 
     return render(request, 'tienda/register.html')
+
