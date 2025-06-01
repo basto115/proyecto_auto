@@ -66,4 +66,8 @@ class PedidoHistorialSerializer(serializers.ModelSerializer):
 
     def get_productos(self, obj):
         items = PedidoProducto.objects.filter(pedido=obj)
-        return PedidoProductoSerializer(items, many=True).data
+
+class ComprobanteTransferenciaSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = Pedido
+        fields = ['comprobante_transferencia']
