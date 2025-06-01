@@ -229,7 +229,7 @@ def realizar_pedido(request):
                 # Vaciar carrito después de pedido exitoso
                 request.session['carrito'] = {}
                 messages.success(request, 'Pedido realizado con éxito.')
-                return redirect('catalogo')
+                return redirect('checkout')
             else:
                 messages.error(request, f"Error al registrar pedido: {response.status_code} - {response.text}")
         except Exception as e:
