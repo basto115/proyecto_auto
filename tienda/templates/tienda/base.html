@@ -53,52 +53,46 @@
                             <li class="nav-item active"><a class="nav-link" href="{% url 'home' %}">Home</a></li>
 
                             <li class="nav-item submenu dropdown">
-                                <a href="#" class="nav-link dropdown-toggle" data-toggle="dropdown" role="button"
-                                    aria-haspopup="true" aria-expanded="false">Repuestos</a>
+                                <a href="#" class="nav-link dropdown-toggle" data-toggle="dropdown">Repuestos</a>
                                 <ul class="dropdown-menu">
-                                    <li class="nav-item"><a class="nav-link" href="{% url 'catalogo' %}">Filtros de aire</a></li>
-                                    <li class="nav-item"><a class="nav-link" href="{% url 'catalogo' %}">Filtros de aceite</a></li>
-                                    <li class="nav-item"><a class="nav-link" href="#">Ver más</a></li>
-                                    <li class="nav-item"><a class="nav-link" href="{% url 'checkout' %}">Bujias</a></li>
-                                    <li class="nav-item"><a class="nav-link" href="{% url 'ver_carrito' %}">Correas de distribucion</a></li>
+                                    <li><a class="nav-link" href="{% url 'catalogo' %}">Filtros de aire</a></li>
+                                    <li><a class="nav-link" href="{% url 'catalogo' %}">Filtros de aceite</a></li>
+                                    <li><a class="nav-link" href="#">Ver más</a></li>
+                                    <li><a class="nav-link" href="{% url 'checkout' %}">Bujías</a></li>
+                                    <li><a class="nav-link" href="{% url 'ver_carrito' %}">Correas de distribución</a></li>
                                 </ul>
                             </li>
 
                             <li class="nav-item submenu dropdown">
-                                <a href="#" class="nav-link dropdown-toggle" data-toggle="dropdown" role="button"
-                                    aria-haspopup="true" aria-expanded="false">Frenos y suspension</a>
+                                <a href="#" class="nav-link dropdown-toggle" data-toggle="dropdown">Frenos y suspensión</a>
                                 <ul class="dropdown-menu">
-                                    <li class="nav-item"><a class="nav-link" href="{% url 'catalogo' %}">Pastillas de freno</a></li>
-                                    <li class="nav-item"><a class="nav-link" href="{% url 'catalogo' %}">Discos de freno</a></li>
-                                    <li class="nav-item"><a class="nav-link" href="{% url 'checkout' %}">Amortiguadores</a></li>
-                                    <li class="nav-item"><a class="nav-link" href="{% url 'ver_carrito' %}">Rótulas</a></li>
-                                    <li class="nav-item {% if request.path == '/blog/' %}active{% endif %}">
-                                        <a class="nav-link" href="{% url 'blog' %}">Blog</a></li>
+                                    <li><a class="nav-link" href="{% url 'catalogo' %}">Pastillas de freno</a></li>
+                                    <li><a class="nav-link" href="{% url 'catalogo' %}">Discos de freno</a></li>
+                                    <li><a class="nav-link" href="{% url 'checkout' %}">Amortiguadores</a></li>
+                                    <li><a class="nav-link" href="{% url 'ver_carrito' %}">Rótulas</a></li>
+                                    <li><a class="nav-link" href="{% url 'blog' %}">Blog</a></li>
                                 </ul>
                             </li>
 
                             <li class="nav-item submenu dropdown">
-                                <a href="#" class="nav-link dropdown-toggle" data-toggle="dropdown" role="button"
-                                    aria-haspopup="true" aria-expanded="false">Electricidad y baterias</a>
+                                <a href="#" class="nav-link dropdown-toggle" data-toggle="dropdown">Electricidad y baterías</a>
                                 <ul class="dropdown-menu">
-                                    <li class="nav-item"><a class="nav-link" href="{% url 'catalogo' %}">Alternadores</a></li>
-                                    <li class="nav-item"><a class="nav-link" href="{% url 'catalogo' %}">Baterias</a></li>
-                                    <li class="nav-item"><a class="nav-link" href="{% url 'checkout' %}">Luces y faros</a></li>
-                                    <li class="nav-item"><a class="nav-link" href="{% url 'ver_carrito' %}">Sensores y fusibles</a></li>
-                                    <li class="nav-item {% if request.path == '/login/' %}active{% endif %}">
-                                        <a class="nav-link" href="{% url 'login' %}">Login</a></li>
-                                    <li class="nav-item"><a class="nav-link" href="{% url 'tracking' %}">Tracking</a></li>
+                                    <li><a class="nav-link" href="{% url 'catalogo' %}">Alternadores</a></li>
+                                    <li><a class="nav-link" href="{% url 'catalogo' %}">Baterías</a></li>
+                                    <li><a class="nav-link" href="{% url 'checkout' %}">Luces y faros</a></li>
+                                    <li><a class="nav-link" href="{% url 'ver_carrito' %}">Sensores y fusibles</a></li>
+                                    <li><a class="nav-link" href="{% url 'login' %}">Login</a></li>
+                                    <li><a class="nav-link" href="{% url 'tracking' %}">Tracking</a></li>
                                 </ul>
                             </li>
 
                             <li class="nav-item submenu dropdown">
-                                <a href="#" class="nav-link dropdown-toggle" data-toggle="dropdown" role="button"
-                                    aria-haspopup="true" aria-expanded="false">Accesorios y seguridad</a>
+                                <a href="#" class="nav-link dropdown-toggle" data-toggle="dropdown">Accesorios y seguridad</a>
                                 <ul class="dropdown-menu">
-                                    <li class="nav-item"><a class="nav-link" href="{% url 'catalogo' %}">Alarmas</a></li>
-                                    <li class="nav-item"><a class="nav-link" href="{% url 'catalogo' %}">Cinturones de seguridad</a></li>
-                                    <li class="nav-item"><a class="nav-link" href="{% url 'checkout' %}">Cubre asientos</a></li>
-                                    <li class="nav-item"><a class="nav-link" href="{% url 'ver_carrito' %}">Kits de emergencia</a></li>
+                                    <li><a class="nav-link" href="{% url 'catalogo' %}">Alarmas</a></li>
+                                    <li><a class="nav-link" href="{% url 'catalogo' %}">Cinturones de seguridad</a></li>
+                                    <li><a class="nav-link" href="{% url 'checkout' %}">Cubre asientos</a></li>
+                                    <li><a class="nav-link" href="{% url 'ver_carrito' %}">Kits de emergencia</a></li>
                                 </ul>
                             </li>
 
@@ -117,25 +111,14 @@
         </div>
     </header>
 
-    <!-- Contenido dinámico -->
-    <main class="container mt-5">
-            {% if messages %}
-            <div class="container" style="margin-top: 100px;">
-                {% for message in messages %}
-                <div class="alert alert-success" role="alert">
-                    {{ message }}
-                </div>
-                {% endfor %}
-            </div>
-            {% endif %}
-    
+    <!-- Mensajes (una sola vez) -->
     {% if messages %}
         <div class="container mt-3">
             {% for message in messages %}
             <div class="alert alert-{{ message.tags }} alert-dismissible fade show" role="alert">
                 {{ message }}
-                <button type="button" class="close" data-dismiss="alert" aria-label="Close">
-                <span aria-hidden="true">&times;</span>
+                <button type="button" class="close" data-dismiss="alert" aria-label="Cerrar">
+                    <span aria-hidden="true">&times;</span>
                 </button>
             </div>
             {% endfor %}

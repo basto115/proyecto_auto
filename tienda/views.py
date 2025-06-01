@@ -23,17 +23,17 @@ def home(request):
 
 def catalogo(request):
     categoria_id = request.GET.get('categoria')
-    categorias = Categoria.objects.all()
-
+    
     if categoria_id:
-        productos = Producto.objects.filter(activo=True, categoria_id=categoria_id)
+        productos = Producto.objects.filter(categoria_id=categoria_id, activo=True)
     else:
         productos = Producto.objects.filter(activo=True)
-
+    
+    categorias = Categoria.objects.all()
     return render(request, 'tienda/catalogo.html', {
         'productos': productos,
         'categorias': categorias,
-        'categoria_id': int(categoria_id) if categoria_id else None,
+        'categoria_seleccionada': int(categoria_id) if categoria_id else None
     })
 
 def agregar_producto(request, producto_id):
