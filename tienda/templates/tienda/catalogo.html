@@ -22,11 +22,11 @@
         {% for producto in productos %}
         <div class="col-md-4 mb-4">
             <div class="card h-100">
-                {% if producto.imagen %}
-                    <img src="{{ producto.imagen.url }}" class="card-img-top" style="max-height: 250px; object-fit: contain;" alt="{{ producto.nombre }}">
-                {% else %}
-                    <img src="{% static 'img/no-image.png' %}" class="card-img-top" alt="Sin imagen">
-                {% endif %}
+					{% if producto.imagen %}
+						<img src="{{ producto.imagen.url }}" alt="{{ producto.nombre }}">
+					{% else %}
+						<img src="{% static 'img/default-product.jpg' %}" alt="Sin imagen">
+					{% endif %}
                 <div class="card-body text-center">
                     <h5 class="card-title">{{ producto.nombre }}</h5>
                     <p class="card-text">${{ producto.precio_unitario|floatformat:0 }}</p>
