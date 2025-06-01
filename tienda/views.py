@@ -12,7 +12,9 @@ import mercadopago
 from django.conf import settings
 from django.contrib.auth.decorators import login_required
 import json
-from django.contrib.auth import authenticate, login
+from django.contrib.auth import authenticate, login, get_user_model
+
+
 # Create your views here.
 
 def home(request):
@@ -134,7 +136,8 @@ def contact(request):
 def realizar_pedido(request):
     productos_json = "[]"
     carrito = request.session.get("carrito", {})
-    return render(request, 'tienda/realizar_pedido.html', {'form': form})
+    return render(request, 'tienda/realizar_pedido.html', {'productos_json': productos_json})
+
 
 @login_required
 def pedidos_bodeguero(request):
@@ -251,6 +254,7 @@ def login_view(request):
     return render(request, 'tienda/login.html')
 
 
+
 def catalogo_por_seccion(request, seccion):
     categorias_nombres = SECCIONES.get(seccion.lower(), [])
     filtro_nombre = request.GET.get('categoria')
@@ -272,3 +276,23 @@ SECCIONES = {
     'electricidad': ['Alternadores', 'Baterías', 'Luces y faros', 'Sensores y fusibles'],
     'accesorios': ['Alarmas', 'Cinturones de seguridad', 'Cubre asientos', 'Kits de emergencia'],
 }
+
+User = get_user_model()
+
+def register_view(request):
+    if request.method == 'POST':
+        email = request.POST['email']
+        password1 = request.POST['password1']
+        password2 = request.POST['password2']
+
+        if password1 != password2:
+            messages.error(request, "Las contraseñas no coinciden.")
+        elif User.objects.filter(email=email).exists():
+            messages.error(request, "Este email ya está registrado.")
+        else:
+            user = User.objects.create_user(username=email, email=email, password=password1)
+            messages.success(request, "Cuenta creada. Ahora puedes iniciar sesión.")
+            return redirect('login')
+
+    return render(request, 'tienda/register.html')
+

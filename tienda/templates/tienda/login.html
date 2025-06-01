@@ -56,9 +56,9 @@
 								 aria-expanded="false">Shop</a>
 								<ul class="dropdown-menu">
 									<li class="nav-item"><a class="nav-link" href="{% url 'catalogo' %}">Shop Category</a></li>
-									<li class="nav-item"><a class="nav-link" href="{% url 'single_product' %}">Product Details</a></li>
+									<li class="nav-item"><a class="nav-link" href="#">Product Details</a></li>
 									<li class="nav-item"><a class="nav-link" href="{% url 'checkout' %}">Product Checkout</a></li>
-									<li class="nav-item"><a class="nav-link" href="{% url 'cart' %}">Shopping Cart</a></li>
+									<li class="nav-item"><a class="nav-link" href="{% url 'ver_carrito' %}">Shopping Cart</a></li>
 									<li class="nav-item"><a class="nav-link" href="{% url 'confirmation' %}">Confirmation</a></li>
 								</ul>
 							</li>
@@ -128,7 +128,7 @@
 						<div class="hover">
 							<h4>New to our website?</h4>
 							<p>There are advances being made in science and technology everyday, and a good example of this is the</p>
-							<a class="primary-btn" href="#">Create an Account</a>
+							<a class="primary-btn" href="{% url 'register' %}">Create an Account</a>
 						</div>
 					</div>
 				</div>
