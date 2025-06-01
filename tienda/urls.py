@@ -33,3 +33,4 @@ urlpatterns = [
     path('pedidos/repartidor/<int:pedido_id>/entregado/', views.marcar_entregado, name='marcar_entregado'),
 ]
 
+# se habian duplicado los urls lol
