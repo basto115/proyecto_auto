@@ -8,13 +8,11 @@
     <h2 class="text-center mb-4">Catálogo de Productos</h2>
 
     <!-- Filtro por categoría -->
-    <form method="get" class="text-center mb-4">
-        <select name="categoria" onchange="this.form.submit()" class="form-control w-auto d-inline-block">
+    <form method="GET" class="mb-4">
+        <select name="categoria" onchange="this.form.submit()" class="form-select">
             <option value="">-- Todas las categorías --</option>
-            {% for categoria in categorias %}
-                <option value="{{ categoria.id }}" {% if categoria.id == categoria_seleccionada %}selected{% endif %}>
-                    {{ categoria.nombre }}
-                </option>
+            {% for cat in categorias %}
+                <option value="{{ cat }}" {% if request.GET.categoria == cat %}selected{% endif %}>{{ cat }}</option>
             {% endfor %}
         </select>
     </form>
@@ -24,11 +22,11 @@
         {% for producto in productos %}
         <div class="col-md-4 mb-4">
             <div class="card h-100">
-                {% if producto.imagen %}
-                    <img src="{{ producto.imagen.url }}" class="card-img-top" style="max-height: 250px; object-fit: contain;" alt="{{ producto.nombre }}">
-                {% else %}
-                    <img src="{% static 'img/no-image.png' %}" class="card-img-top" alt="Sin imagen">
-                {% endif %}
+					{% if producto.imagen %}
+						<img src="{{ producto.imagen.url }}" alt="{{ producto.nombre }}">
+					{% else %}
+						<img src="{% static 'img/default-product.jpg' %}" alt="Sin imagen">
+					{% endif %}
                 <div class="card-body text-center">
                     <h5 class="card-title">{{ producto.nombre }}</h5>
                     <p class="card-text">${{ producto.precio_unitario|floatformat:0 }}</p>
