@@ -249,3 +249,26 @@ def login_view(request):
             messages.error(request, 'Correo o contraseña incorrectos.')
 
     return render(request, 'tienda/login.html')
+
+
+def catalogo_por_seccion(request, seccion):
+    categorias_nombres = SECCIONES.get(seccion.lower(), [])
+    filtro_nombre = request.GET.get('categoria')
+
+    if filtro_nombre and filtro_nombre in categorias_nombres:
+        productos = Producto.objects.filter(categoria__nombre=filtro_nombre, activo=True)
+    else:
+        productos = Producto.objects.filter(categoria__nombre__in=categorias_nombres, activo=True)
+
+    return render(request, 'tienda/catalogo.html', {
+        'productos': productos,
+        'categorias': categorias_nombres,
+        'seccion': seccion.capitalize()
+    })
+    
+SECCIONES = {
+    'repuestos': ['Filtros de aire', 'Filtros de aceite', 'Bujías', 'Correas de distribución'],
+    'frenos': ['Pastillas de freno', 'Discos de freno', 'Amortiguadores', 'Rótulas'],
+    'electricidad': ['Alternadores', 'Baterías', 'Luces y faros', 'Sensores y fusibles'],
+    'accesorios': ['Alarmas', 'Cinturones de seguridad', 'Cubre asientos', 'Kits de emergencia'],
+}

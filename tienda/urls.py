@@ -33,4 +33,5 @@ urlpatterns = [
     path('pedidos/repartidor/', views.pedidos_repartidor, name='pedidos_repartidor'),
     path('pedidos/repartidor/<int:pedido_id>/entregado/', views.marcar_entregado, name='marcar_entregado'),
     path('producto/<int:producto_id>/', views.detalle_producto, name='detalle_producto'),
+    path('<str:seccion>/', views.catalogo_por_seccion, name='catalogo_por_seccion'),
 ]
