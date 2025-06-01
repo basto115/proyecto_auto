@@ -207,7 +207,7 @@ def realizar_pedido(request):
 
     # Si se envía el formulario (POST)
     if request.method == 'POST':
-        cliente_id = request.POST.get('cliente_id')
+        cliente_id = request.user.id
         tipo_entrega = request.POST.get('tipo_entrega')
         direccion = request.POST.get('direccion_entrega')
         productos = request.POST.get('productos')
@@ -229,7 +229,7 @@ def realizar_pedido(request):
                 # Vaciar carrito después de pedido exitoso
                 request.session['carrito'] = {}
                 messages.success(request, 'Pedido realizado con éxito.')
-                return redirect('catalogo')
+                return redirect('checkout')
             else:
                 messages.error(request, f"Error al registrar pedido: {response.status_code} - {response.text}")
         except Exception as e:
@@ -287,18 +287,26 @@ def register_view(request):
         email = request.POST['email']
         password1 = request.POST['password1']
         password2 = request.POST['password2']
+        is_b2b_raw = request.POST.get('is_b2b', 'false')
+        is_b2b = True if is_b2b_raw == 'true' else False
 
         if password1 != password2:
             messages.error(request, "Las contraseñas no coinciden.")
         elif User.objects.filter(email=email).exists():
             messages.error(request, "Este email ya está registrado.")
         else:
-            user = User.objects.create_user(username=email, email=email, password=password1)
-            login(request, user)  # inicia sesión automáticamente
-            return redirect('home')  # redirige al home
-
+            user = User.objects.create_user(
+                username=email,
+                email=email,
+                password=password1
+            )
+            user.is_b2b = is_b2b
+            user.save()
+            login(request, user)
+            return redirect('home')
 
     return render(request, 'tienda/register.html')
+
 
 
 def logout_view(request):
