@@ -7,9 +7,33 @@
 <div class="row justify-content-center">
     <div class="col-md-6">
         <h2 class="mb-4 mt-5 text-center">Realizar Pedido</h2>
+
         <form method="post" class="shadow p-4 border rounded bg-white">
             {% csrf_token %}
 
+            <div class="form-group">
+                <label>Nombre</label>
+                <input type="text" class="form-control" value="{{ user.nombre }}" readonly>
+            </div>
+            <div class="form-group">
+                <label>Apellido</label>
+                <input type="text" class="form-control" value="{{ user.apellido }}" readonly>
+            </div>
+            <div class="form-group">
+                <label>RUT</label>
+                <input type="text" class="form-control" value="{{ user.rut }}" readonly>
+            </div>
+            <div class="form-group">
+                <label>Teléfono</label>
+                <input type="text" class="form-control" value="{{ user.telefono }}" readonly>
+            </div>
+            <div class="form-group">
+                <label>Email</label>
+                <input type="email" class="form-control" value="{{ user.email }}" readonly>
+            </div>
+            <!-- Ya NO incluimos comuna -->
+
+            <!-- Campos del pedido -->
             <div class="form-group">
                 <label for="id_tipo_entrega">Tipo de entrega</label>
                 <select name="tipo_entrega" class="form-control" id="id_tipo_entrega">
@@ -17,11 +41,31 @@
                     <option value="envio">Envío a domicilio</option>
                 </select>
             </div>
-
             <div class="form-group">
-                <label for="id_direccion_entrega">Dirección entrega</label>
+                <label for="id_direccion_entrega">Dirección de entrega</label>
                 <input type="text" name="direccion_entrega" class="form-control" id="id_direccion_entrega">
             </div>
+
+
+            <h4 class="mt-4">Resumen del pedido</h4>
+            <table class="table table-striped">
+                <thead>
+                    <tr>
+                        <th>Producto</th>
+                        <th>Código</th>
+                        <th>Cantidad</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for item in productos_visuales %}
+                    <tr>
+                        <td>{{ item.nombre }}</td>
+                        <td>{{ item.codigo }}</td>
+                        <td>{{ item.cantidad }}</td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
 
             <input type="hidden" name="productos" id="productos">
             <button type="submit" class="btn btn-primary btn-block">Enviar Pedido</button>
@@ -33,5 +77,4 @@
     const productosSeleccionados = JSON.parse('{{ productos_json|escapejs }}');
     document.getElementById('productos').value = JSON.stringify(productosSeleccionados);
 </script>
-
 {% endblock %}

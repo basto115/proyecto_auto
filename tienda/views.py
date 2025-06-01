@@ -234,6 +234,8 @@ def realizar_pedido(request):
                 messages.error(request, f"Error al registrar pedido: {response.status_code} - {response.text}")
         except Exception as e:
             messages.error(request, f"Error al conectar con la API: {str(e)}")
+            
+            
 
     return render(request, 'tienda/realizar_pedido.html', {
         'productos_json': productos_json,
@@ -287,8 +289,12 @@ def register_view(request):
         email = request.POST['email']
         password1 = request.POST['password1']
         password2 = request.POST['password2']
-        is_b2b_raw = request.POST.get('is_b2b', 'false')
-        is_b2b = True if is_b2b_raw == 'true' else False
+        nombre = request.POST.get('nombre')
+        apellido = request.POST.get('apellido')
+        rut = request.POST.get('rut')
+        telefono = request.POST.get('telefono')
+        is_b2b_raw = request.POST.get('is_b2b')
+        is_b2b = is_b2b_raw in ['true', 'True', 'on', '1']
 
         if password1 != password2:
             messages.error(request, "Las contraseñas no coinciden.")
@@ -298,10 +304,13 @@ def register_view(request):
             user = User.objects.create_user(
                 username=email,
                 email=email,
-                password=password1
+                password=password1,
+                is_b2b=is_b2b,
+                nombre=nombre,
+                apellido=apellido,
+                rut=rut,
+                telefono=telefono,
             )
-            user.is_b2b = is_b2b
-            user.save()
             login(request, user)
             return redirect('home')
 
