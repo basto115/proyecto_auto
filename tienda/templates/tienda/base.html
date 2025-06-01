@@ -65,7 +65,6 @@
                                     <li class="nav-item"><a class="nav-link" href="{% url 'ver_carrito' %}">Rótulas</a></li>
                                     <li class="nav-item {% if request.path == '/blog/' %}active{% endif %}">
                                         <a class="nav-link" href="{% url 'blog' %}">Blog</a></li>
-                                    <li class="nav-item"><a class="nav-link" href="{% url 'single_blog' %}">Blog Details</a></li>
                                 </ul>
                             </li>
 
@@ -108,9 +107,17 @@
             </nav>
         </div>
     </header>
-
     <!-- Contenido dinámico -->
     <main class="container mt-5">
+            {% if messages %}
+            <div class="container" style="margin-top: 100px;">
+                {% for message in messages %}
+                <div class="alert alert-success" role="alert">
+                    {{ message }}
+                </div>
+                {% endfor %}
+            </div>
+            {% endif %}
         {% block content %}
         {% endblock %}
     </main>

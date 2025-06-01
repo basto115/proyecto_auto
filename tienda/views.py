@@ -1,6 +1,6 @@
 from django.shortcuts import render, redirect
 from django.http import HttpResponse
-from .models import Producto
+from .models import Producto, Pedido
 import requests
 from django.contrib import messages
 from .forms import PedidoForm
@@ -10,6 +10,8 @@ from .models import Producto, Categoria
 from django.urls import reverse
 import mercadopago
 from django.conf import settings
+from django.contrib.auth.decorators import login_required
+
 
 # Create your views here.
 
@@ -35,7 +37,7 @@ def catalogo(request):
 def agregar_producto(request, producto_id):
     carrito = request.session.get('carrito', {})
     producto = get_object_or_404(Producto, id=producto_id)
-
+    
     if str(producto_id) in carrito:
         carrito[str(producto_id)]['cantidad'] += 1
     else:
@@ -44,8 +46,9 @@ def agregar_producto(request, producto_id):
             'precio': float(producto.precio_unitario),
             'cantidad': 1,
         }
-
+        
     request.session['carrito'] = carrito
+    messages.success(request, f"✅ {producto.nombre} fue añadido al carrito.")
     return redirect('catalogo')
 
 def ver_carrito(request):
@@ -84,7 +87,6 @@ def checkout(request):
 
     sdk = mercadopago.SDK(settings.MERCADO_PAGO_ACCESS_TOKEN)
 
-    # 🔽 Aquí va tu bloque preference_data:
     preference_data = {
         "items": preference_items,
         "back_urls": {
@@ -92,10 +94,8 @@ def checkout(request):
             "failure": request.build_absolute_uri(reverse('ver_carrito')),
             "pending": request.build_absolute_uri(reverse('ver_carrito')),
         },
-        #"auto_return": "approved"
     }
 
-    # Crear preferencia
     preference_response = sdk.preference().create(preference_data)
     response_data = preference_response.get("response", {})
 
@@ -112,12 +112,6 @@ def checkout(request):
 def confirmacion_pago(request):
     request.session['carrito'] = {}  
     return render(request, 'tienda/confirmacion.html')
-
-
-def single_product(request, producto_id):
-    producto = Producto.objects.get(id=producto_id)
-    return render(request, 'tienda/single_product.html', {'producto': producto})
-
 
 def blog(request):
     return render(request, 'tienda/blog.html')
@@ -162,3 +156,53 @@ def realizar_pedido(request):
         form = PedidoForm()
 
     return render(request, 'tienda/realizar_pedido.html', {'form': form})
+
+@login_required
+def pedidos_bodeguero(request):
+    pedidos = Pedido.objects.filter(estado='pagado')
+    return render(request, 'tienda/pedidos_bodeguero.html', {'pedidos': pedidos})
+
+@login_required
+def marcar_recolectado(request, pedido_id):
+    pedido = get_object_or_404(Pedido, id=pedido_id)
+    if pedido.estado == 'pagado':
+        pedido.estado = 'recolectado'
+        pedido.save()
+    return redirect('pedidos_bodeguero')
+
+@login_required
+def pedidos_repartidor(request):
+    pedidos = Pedido.objects.filter(estado='recolectado')
+    return render(request, 'tienda/pedidos_repartidor.html', {'pedidos': pedidos})
+
+@login_required
+def marcar_entregado(request, pedido_id):
+    pedido = get_object_or_404(Pedido, id=pedido_id)
+    if pedido.estado == 'recolectado':
+        pedido.estado = 'entregado'
+        pedido.save()
+    return redirect('pedidos_repartidor')
+
+def pedidos_bodeguero(request):
+    pedidos = Pedido.objects.filter(estado='recolectando')
+    return render(request, 'tienda/pedidos_bodeguero.html', {'pedidos': pedidos})
+
+def marcar_recolectado(request, pedido_id):
+    pedido = get_object_or_404(Pedido, id=pedido_id)
+    pedido.estado = 'recolectado'
+    pedido.save()
+    return redirect('pedidos_bodeguero')
+
+def pedidos_repartidor(request):
+    pedidos = Pedido.objects.filter(estado='recolectado')
+    return render(request, 'tienda/pedidos_repartidor.html', {'pedidos': pedidos})
+
+def marcar_entregado(request, pedido_id):
+    pedido = get_object_or_404(Pedido, id=pedido_id)
+    pedido.estado = 'entregado'
+    pedido.save()
+    return redirect('pedidos_repartidor')
+
+def detalle_producto(request, producto_id):
+    producto = get_object_or_404(Producto, id=producto_id)
+    return render(request, 'tienda/detalle_producto.html', {'producto': producto})

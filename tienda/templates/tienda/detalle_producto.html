@@ -1,0 +1,14 @@
+{% extends 'tienda/base.html' %}
+{% load static %}
+
+{% block content %}
+<main class="container mt-5">
+    <h2>{{ producto.nombre }}</h2>
+    <img src="{{ producto.imagen.url }}" alt="{{ producto.nombre }}" style="max-width: 300px;">
+    <p><strong>Precio:</strong> ${{ producto.precio_unitario }}</p>
+    <p><strong>Descripción:</strong> {{ producto.descripcion }}</p>
+    <p><strong>Stock disponible:</strong> {{ producto.stock_disponible }}</p>
+    <p><strong>Descripción:</strong> {{ producto.descripcion }}</p>
+    <a href="{% url 'agregar_producto' producto.id %}" class="btn btn-sm btn-success mt-2">Agregar al carrito</a>
+</main>
+{% endblock %}
