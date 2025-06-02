@@ -33,21 +33,18 @@
 					{% else %}
 						<img src="{% static 'img/default-product.jpg' %}" alt="Sin imagen">
 					{% endif %}
-                <div class="card-body text-center">
-                    <h5 class="card-title">{{ producto.nombre }}</h5>
-                    <p class="card-text">
-                    {% if modo_b2b %}
-                        ${{ producto.precio_mayorista|floatformat:0 }}
-                    {% else %}
-                        ${{ producto.precio_unitario|floatformat:0 }}
-                    {% endif %}
-                    </p>
-
-
-                    <a href="{% url 'agregar_producto' producto.id %}" class="btn btn-success btn-sm mb-2">Agregar al carrito</a>
-                    <a href="{% url 'detalle_producto' producto.id %}" class="btn btn-primary btn-sm">Ver más</a>
-                </div>
-            </div>
+                    <div class="card-body text-center">
+                        <h5 class="card-title">{{ producto.nombre }}</h5>
+                        <p class="card-text">
+                            {% if modo_b2b %}
+                                ${{ producto.precio_mayorista|floatformat:0 }}
+                            {% else %}
+                                ${{ producto.precio_unitario|floatformat:0 }}
+                            {% endif %}
+                        </p>
+                        <a href="{% url 'agregar_producto' producto.id %}" class="btn btn-success btn-sm mb-2">Agregar al carrito</a>
+                        <a href="{% url 'detalle_producto' producto.id %}" class="btn btn-primary btn-sm">Ver más</a>
+                    </div>
         </div>
         {% empty %}
         <div class="col-12">
