@@ -105,12 +105,14 @@ def checkout(request):
 
     sdk = mercadopago.SDK(settings.MERCADO_PAGO_ACCESS_TOKEN)
 
+    domain = "https://autoparts.pythonanywhere.com"
+
     preference_data = {
         "items": preference_items,
         "back_urls": {
-            "success": request.build_absolute_uri(reverse('confirmacion_pago')),
-            "failure": request.build_absolute_uri(reverse('ver_carrito')),
-            "pending": request.build_absolute_uri(reverse('ver_carrito')),
+            "success": domain + reverse('confirmacion_pago'),
+            "failure": domain + reverse('ver_carrito'),
+            "pending": domain + reverse('ver_carrito'),
         },
         "auto_return": "approved"
     }
@@ -120,10 +122,10 @@ def checkout(request):
 
     if "init_point" in response_data:
         return render(request, 'tienda/checkout.html', {
-        'carrito': carrito,
-        'init_point': response_data["init_point"],
-        'preference_id': response_data.get("id")
-    })
+            'carrito': carrito,
+            'init_point': response_data["init_point"],
+            'preference_id': response_data.get("id")
+        })
     else:
         error = response_data.get("message", "No se pudo generar la preferencia de pago.")
         return render(request, 'tienda/checkout_error.html', {"error": error, "detalles": response_data})
