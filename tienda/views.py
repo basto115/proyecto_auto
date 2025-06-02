@@ -173,6 +173,22 @@ def marcar_entregado(request, pedido_id):
         pedido.save()
     return redirect('pedidos_repartidor')
 
+@login_required
+def catalogo_b2b(request):
+    if not request.user.is_b2b:
+        return redirect('catalogo')
+
+    productos = Producto.objects.filter(activo=True)
+    categorias = Categoria.objects.values_list('nombre', flat=True)  
+
+    return render(request, 'tienda/catalogo.html', {
+        'productos': productos,
+        'categorias': categorias,         
+        'modo_b2b': True
+    })
+
+
+
 def pedidos_bodeguero(request):
     pedidos = Pedido.objects.filter(estado='recolectando')
     return render(request, 'tienda/pedidos_bodeguero.html', {'pedidos': pedidos})
@@ -491,4 +507,4 @@ class PedidosPendientesView(APIView):
             })
 
         return Response(data, status=status.HTTP_200_OK)
-    
+

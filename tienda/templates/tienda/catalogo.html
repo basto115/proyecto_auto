@@ -6,6 +6,12 @@
 {% block content %}
 <div class="container">
     <h2 class="text-center mb-4">Catálogo de Productos</h2>
+    {% if modo_b2b %}
+    <div class="alert alert-info text-center">
+        Estás viendo el catálogo exclusivo para distribuidores (precios mayoristas).
+    </div>
+    {% endif %}
+
 
     <!-- Filtro por categoría -->
     <form method="GET" class="mb-4">
@@ -29,7 +35,14 @@
 					{% endif %}
                 <div class="card-body text-center">
                     <h5 class="card-title">{{ producto.nombre }}</h5>
-                    <p class="card-text">${{ producto.precio_unitario|floatformat:0 }}</p>
+                    <p class="card-text">
+                    {% if modo_b2b %}
+                        <strong>Precio Mayorista:</strong> ${{ producto.precio_mayorista|floatformat:0 }}
+                    {% else %}
+                        <strong>Precio:</strong> ${{ producto.precio_unitario|floatformat:0 }}
+                    {% endif %}
+                    </p>
+
                     <a href="{% url 'agregar_producto' producto.id %}" class="btn btn-success btn-sm mb-2">Agregar al carrito</a>
                     <a href="{% url 'detalle_producto' producto.id %}" class="btn btn-primary btn-sm">Ver más</a>
                 </div>
