@@ -81,7 +81,11 @@
         <h2>{{ producto.nombre }}</h2>
         <p><strong>Marca:</strong> {{ producto.marca }}</p>
         <p><strong>Código:</strong> {{ producto.codigo_producto }}</p>
-        <p class="price">${{ producto.precio_unitario|floatformat:0 }}</p>
+        <p class="price">${{ precio|floatformat:0 }}</p>
+        {% if modo_b2b %}
+            <p class="text-muted"><em>Precio mayorista para distribuidores.</em></p>
+        {% endif %}
+
         <p class="stock">
             {% if producto.stock_disponible > 0 %}
                 <span>Stock disponible: {{ producto.stock_disponible }} {{ producto.unidad_medida }}</span>

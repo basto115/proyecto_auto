@@ -48,16 +48,22 @@ def catalogo(request):
 def agregar_producto(request, producto_id):
     carrito = request.session.get('carrito', {})
     producto = get_object_or_404(Producto, id=producto_id)
-    
+
+    # Elegir el precio según si es B2B
+    if request.user.is_authenticated and request.user.is_b2b:
+        precio = float(producto.precio_mayorista)
+    else:
+        precio = float(producto.precio_unitario)
+
     if str(producto_id) in carrito:
         carrito[str(producto_id)]['cantidad'] += 1
     else:
         carrito[str(producto_id)] = {
             'nombre': producto.nombre,
-            'precio': float(producto.precio_unitario),
+            'precio': precio,
             'cantidad': 1,
         }
-        
+
     request.session['carrito'] = carrito
     messages.success(request, f"✅ {producto.nombre} fue añadido al carrito.")
     return redirect('catalogo')
@@ -203,7 +209,20 @@ def marcar_entregado(request, pedido_id):
 
 def detalle_producto(request, producto_id):
     producto = get_object_or_404(Producto, id=producto_id)
-    return render(request, 'tienda/detalle_producto.html', {'producto': producto})
+
+    if request.user.is_authenticated and request.user.is_b2b:
+        precio = producto.precio_mayorista
+        modo_b2b = True
+    else:
+        precio = producto.precio_unitario
+        modo_b2b = False
+
+    return render(request, 'tienda/detalle_producto.html', {
+        'producto': producto,
+        'precio': precio,
+        'modo_b2b': modo_b2b,
+    })
+
 
 def realizar_pedido(request):
     productos_json = "[]"
