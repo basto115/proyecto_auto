@@ -507,3 +507,17 @@ def rol_requerido(rol_permitido):
             return view_func(request, *args, **kwargs)
         return _wrapped_view
     return decorator
+
+class B2BProductsView(APIView):
+    def get(self, request):
+        user = request.user
+
+        if not user.is_authenticated:
+            return Response({'error': 'Autenticación requerida'}, status=status.HTTP_401_UNAUTHORIZED)
+
+        if not user.is_b2b:
+            return Response({'error': 'Acceso restringido a distribuidores B2B'}, status=status.HTTP_403_FORBIDDEN)
+
+        productos = Producto.objects.filter(activo=True)
+        serializer = ProductoSerializer(productos, many=True)
+        return Response(serializer.data)
