@@ -47,25 +47,7 @@
             </div>
 
 
-            <h4 class="mt-4">Resumen del pedido</h4>
-            <table class="table table-striped">
-                <thead>
-                    <tr>
-                        <th>Producto</th>
-                        <th>Código</th>
-                        <th>Cantidad</th>
-                    </tr>
-                </thead>
-                <tbody>
-                    {% for item in productos_visuales %}
-                    <tr>
-                        <td>{{ item.nombre }}</td>
-                        <td>{{ item.codigo }}</td>
-                        <td>{{ item.cantidad }}</td>
-                    </tr>
-                    {% endfor %}
-                </tbody>
-            </table>
+            
 
             <input type="hidden" name="productos" id="productos">
             <button type="submit" class="btn btn-primary btn-block">Enviar Pedido</button>
