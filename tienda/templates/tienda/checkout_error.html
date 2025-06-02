@@ -1,0 +1,12 @@
+{% extends 'tienda/base.html' %}
+
+{% block title %}Error en Checkout{% endblock %}
+
+{% block content %}
+<div class="container mt-5 text-center">
+    <h2 class="text-danger">❌ Error al generar botón de pago</h2>
+    <p>{{ error }}</p>
+    <pre>{{ detalles }}</pre>
+    <a href="{% url 'ver_carrito' %}" class="btn btn-secondary mt-4">Volver al carrito</a>
+</div>
+{% endblock %}
