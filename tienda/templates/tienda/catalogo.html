@@ -37,11 +37,12 @@
                     <h5 class="card-title">{{ producto.nombre }}</h5>
                     <p class="card-text">
                     {% if modo_b2b %}
-                        <strong>Precio Mayorista:</strong> ${{ producto.precio_mayorista|floatformat:0 }}
+                        ${{ producto.precio_mayorista|floatformat:0 }}
                     {% else %}
-                        <strong>Precio:</strong> ${{ producto.precio_unitario|floatformat:0 }}
+                        ${{ producto.precio_unitario|floatformat:0 }}
                     {% endif %}
                     </p>
+
 
                     <a href="{% url 'agregar_producto' producto.id %}" class="btn btn-success btn-sm mb-2">Agregar al carrito</a>
                     <a href="{% url 'detalle_producto' producto.id %}" class="btn btn-primary btn-sm">Ver más</a>

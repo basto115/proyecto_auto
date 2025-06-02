@@ -28,18 +28,22 @@ def home(request):
 
 def catalogo(request):
     categoria_id = request.GET.get('categoria')
-    
+
     if categoria_id:
         productos = Producto.objects.filter(categoria_id=categoria_id, activo=True)
     else:
         productos = Producto.objects.filter(activo=True)
-    
+
     categorias = Categoria.objects.all()
+    modo_b2b = request.user.is_authenticated and request.user.is_b2b
+
     return render(request, 'tienda/catalogo.html', {
         'productos': productos,
         'categorias': categorias,
-        'categoria_seleccionada': int(categoria_id) if categoria_id else None
+        'categoria_seleccionada': int(categoria_id) if categoria_id else None,
+        'modo_b2b': modo_b2b
     })
+
 
 def agregar_producto(request, producto_id):
     carrito = request.session.get('carrito', {})
@@ -173,20 +177,6 @@ def marcar_entregado(request, pedido_id):
         pedido.estado = 'entregado'
         pedido.save()
     return redirect('pedidos_repartidor')
-
-@login_required
-def catalogo_b2b(request):
-    if not request.user.is_b2b:
-        return redirect('catalogo')
-
-    productos = Producto.objects.filter(activo=True)
-    categorias = Categoria.objects.values_list('nombre', flat=True)  
-
-    return render(request, 'tienda/catalogo.html', {
-        'productos': productos,
-        'categorias': categorias,         
-        'modo_b2b': True
-    })
 
 
 
