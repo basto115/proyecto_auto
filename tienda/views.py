@@ -19,6 +19,7 @@ from rest_framework import status
 from .serializers import CustomUserRegisterSerializer, ProductoSerializer, PedidoSerializer, PedidoHistorialSerializer, ComprobanteTransferenciaSerializer
 from rest_framework.generics import RetrieveAPIView
 from rest_framework.parsers import MultiPartParser, FormParser
+from functools import wraps
 # Create your views here.
 
 def home(request):
@@ -492,3 +493,17 @@ class PedidosPendientesView(APIView):
 
         return Response(data, status=status.HTTP_200_OK)
     
+
+def rol_requerido(rol_permitido):
+    def decorator(view_func):
+        @wraps(view_func)
+        def _wrapped_view(request, *args, **kwargs):
+            if not request.user.is_authenticated:
+                return Response({'error': 'No autenticado'}, status=status.HTTP_401_UNAUTHORIZED)
+
+            if request.user.rol != rol_permitido:
+                return Response({'error': f'Se requiere rol: {rol_permitido}'}, status=status.HTTP_403_FORBIDDEN)
+
+            return view_func(request, *args, **kwargs)
+        return _wrapped_view
+    return decorator

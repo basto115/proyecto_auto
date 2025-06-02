@@ -19,6 +19,13 @@ class CustomUser(AbstractUser):
     USERNAME_FIELD = 'email'
     REQUIRED_FIELDS = []
 
+    ROLES = [
+    ('cliente', 'Cliente'),
+    ('bodeguero', 'Bodeguero'),
+    ('contador', 'Contador'),
+    ('repartidor', 'Repartidor'),
+    ]
+    rol = models.CharField(max_length=20, choices=ROLES, default='cliente')
     groups = models.ManyToManyField('auth.Group', related_name='customuser_groups', blank=True)
     user_permissions = models.ManyToManyField('auth.Permission', related_name='customuser_permissions', blank=True)
 
