@@ -22,7 +22,7 @@
 
     <style>
         body {
-            padding-top: 120px; /* ajusta este valor según el alto real de tu navbar */
+            padding-top: 120px; 
         }
 
         .alert {
@@ -68,6 +68,14 @@
                             <li class="nav-item {% if 'accesorios' in request.path %}active{% endif %}">
                                 <a class="nav-link" href="{% url 'catalogo_por_seccion' 'accesorios' %}">Accesorios y Seguridad</a>
                             </li>
+
+                            {% if request.user.is_authenticated and request.user.is_b2b %}
+                                <li class="nav-item {% if request.path == '/distribuidores/' %}active{% endif %}">
+                                    <a class="nav-link" href="{% url 'vista_distribuidores' %}">
+                                        <i class="fa fa-industry"></i> Distribuidores
+                                    </a>
+                                </li>
+                            {% endif %}
 
                             <li class="nav-item dropdown">
                             <a class="nav-link dropdown-toggle" href="#" id="userDropdown" role="button" data-toggle="dropdown">

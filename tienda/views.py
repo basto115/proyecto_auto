@@ -41,7 +41,7 @@ def catalogo(request):
         'productos': productos,
         'categorias': categorias,
         'categoria_seleccionada': int(categoria_id) if categoria_id else None,
-        'modo_b2b': modo_b2b  # 👈 ESTA LÍNEA ES OBLIGATORIA
+        'modo_b2b': modo_b2b  
     })
 
 
@@ -229,7 +229,7 @@ def detalle_producto(request, producto_id):
 def realizar_pedido(request):
     productos_json = "[]"
     carrito = request.session.get("carrito", {})
-    # Convertir los productos del carrito en JSON compatible con la API
+    
     if carrito:
         productos_json = json.dumps([
             {
@@ -239,7 +239,7 @@ def realizar_pedido(request):
             for item in carrito.values()
         ])
 
-    # Si se envía el formulario (POST)
+
     if request.method == 'POST':
         cliente_id = request.user.id
         tipo_entrega = request.POST.get('tipo_entrega')
@@ -281,12 +281,12 @@ def login_view(request):
         email = request.POST.get('email')
         password = request.POST.get('password')
 
-        # Importante: si estás usando email como username
+
         user = authenticate(request, username=email, password=password)
 
         if user is not None:
             login(request, user)
-            return redirect('home')  # Redirige a donde quieras después de iniciar sesión
+            return redirect('home')
         else:
             messages.error(request, 'Correo o contraseña incorrectos.')
 
@@ -303,9 +303,12 @@ def catalogo_por_seccion(request, seccion):
     else:
         productos = Producto.objects.filter(categoria__nombre__in=categorias_nombres, activo=True)
 
+    modo_b2b = request.user.is_authenticated and request.user.is_b2b
+
     return render(request, 'tienda/catalogo.html', {
         'productos': productos,
         'categorias': categorias_nombres,
+        'modo_b2b': modo_b2b,
         'seccion': seccion.capitalize()
     })
     
@@ -550,3 +553,12 @@ class B2BProductsView(APIView):
         serializer = ProductoSerializer(productos, many=True)
         return Response(serializer.data)
 
+def vista_distribuidores(request):
+    if not request.user.is_authenticated or not request.user.is_b2b:
+        return redirect('login')
+
+    productos = Producto.objects.filter(precio_mayorista__gt=0, activo=True)
+    return render(request, 'tienda/productos_b2b.html', {
+        'productos': productos,
+        'modo_b2b': True,
+    })

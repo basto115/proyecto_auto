@@ -1,0 +1,36 @@
+{% extends 'tienda/base.html' %}
+{% load static %}
+
+{% block title %}Productos para Distribuidores{% endblock %}
+
+{% block content %}
+<div class="container">
+    <h2 class="text-center mb-4">Catálogo Exclusivo para Distribuidores</h2>
+
+    <div class="alert alert-info text-center">
+        Estás viendo productos con precio mayorista. Solo disponible para cuentas autorizadas.
+    </div>
+
+    <div class="row">
+    {% for producto in productos %}
+    <div class="col-md-4 mb-4">
+        <div class="card h-100">
+        {% if producto.imagen %}
+            <img src="{{ producto.imagen.url }}" class="card-img-top img-fluid" style="max-height: 200px; object-fit: contain;" alt="{{ producto.nombre }}">
+        {% else %}
+            <img src="{% static 'img/default-product.jpg' %}" class="card-img-top img-fluid" style="max-height: 200px; object-fit: contain;" alt="Sin imagen">
+        {% endif %}
+        <div class="card-body text-center">
+            <h5 class="card-title">{{ producto.nombre }}</h5>
+            <p class="card-text text-success fw-bold">${{ producto.precio_mayorista|floatformat:0 }}</p>
+            <p class="card-text"><strong>Stock:</strong> {{ producto.stock_disponible }}</p>
+            <a href="{% url 'detalle_producto' producto.id %}" class="btn btn-primary btn-sm">Ver más</a>
+        </div>
+        </div>
+    </div>
+    {% empty %}
+    <p class="text-center">No hay productos disponibles para distribuidores en este momento.</p>
+    {% endfor %}
+    </div>
+</div>
+{% endblock %}

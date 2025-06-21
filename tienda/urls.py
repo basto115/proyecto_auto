@@ -2,7 +2,7 @@
 from django.urls import path
 from . import views
 from .views import realizar_pedido, login_view, register_view, logout_view, RegisterUserView, ProductoDetailView, PedidosPorUsuarioView, CrearPedidoPorEmailView, CrearPedidoPorIDView
-from .views import ProductoDetalleView, HistorialPedidosView, ActualizarEstadoPedidoView, SubirComprobanteView, PedidosPendientesView, B2BProductsView
+from .views import ProductoDetalleView, HistorialPedidosView, ActualizarEstadoPedidoView, SubirComprobanteView, PedidosPendientesView, B2BProductsView, vista_distribuidores
 
 urlpatterns = [
     path('', views.home, name="home"),
@@ -36,7 +36,7 @@ urlpatterns = [
 
     
     path('producto/<int:producto_id>/', views.detalle_producto, name='detalle_producto'),
-    path('<str:seccion>/', views.catalogo_por_seccion, name='catalogo_por_seccion'),
+
     
     path('api/register/', RegisterUserView.as_view(), name='api_register_user'),
     path('api/products/<int:id>/', ProductoDetailView.as_view(), name='producto_detail'),
@@ -49,6 +49,11 @@ urlpatterns = [
     path('api/pedidos/<int:pedido_id>/subir_comprobante/', SubirComprobanteView.as_view(), name='subir_comprobante'),
     path('api/pedidos/pendientes/', PedidosPendientesView.as_view(), name='pedidos_pendientes'),
     path('api/b2b/products', B2BProductsView.as_view(), name='b2b_products'),
+    
+    path('distribuidores/', vista_distribuidores, name='vista_distribuidores'),
+    
+    path('<str:seccion>/', views.catalogo_por_seccion, name='catalogo_por_seccion'),
+
 ]
 
 # se habian duplicado los urls lol

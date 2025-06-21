@@ -36,12 +36,9 @@
                 <input type="text" name="telefono" class="form-control" required>
             </div>
 
-            <div class="form-group">
-                <label for="is_b2b">¿Eres cliente B2B?</label>
-                <select name="is_b2b" id="is_b2b" class="form-control">
-                    <option value="false" selected>No</option>
-                    <option value="true">Sí</option>
-                </select>
+            <div class="form-group form-check">
+            <input type="checkbox" name="is_b2b" id="is_b2b" class="form-check-input">
+            <label class="form-check-label" for="is_b2b">¿Eres cliente B2B?</label>
             </div>
 
             <button type="submit" class="btn btn-primary btn-block">Registrarse</button>
