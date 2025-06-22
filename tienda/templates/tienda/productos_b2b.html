@@ -11,26 +11,56 @@
         Estás viendo productos con precio mayorista. Solo disponible para cuentas autorizadas.
     </div>
 
-    <div class="row">
-    {% for producto in productos %}
-    <div class="col-md-4 mb-4">
-        <div class="card h-100">
-        {% if producto.imagen %}
-            <img src="{{ producto.imagen.url }}" class="card-img-top img-fluid" style="max-height: 200px; object-fit: contain;" alt="{{ producto.nombre }}">
-        {% else %}
-            <img src="{% static 'img/default-product.jpg' %}" class="card-img-top img-fluid" style="max-height: 200px; object-fit: contain;" alt="Sin imagen">
-        {% endif %}
-        <div class="card-body text-center">
-            <h5 class="card-title">{{ producto.nombre }}</h5>
-            <p class="card-text text-success fw-bold">${{ producto.precio_mayorista|floatformat:0 }}</p>
-            <p class="card-text"><strong>Stock:</strong> {{ producto.stock_disponible }}</p>
-            <a href="{% url 'detalle_producto' producto.id %}" class="btn btn-primary btn-sm">Ver más</a>
-        </div>
-        </div>
-    </div>
-    {% empty %}
-    <p class="text-center">No hay productos disponibles para distribuidores en este momento.</p>
-    {% endfor %}
+    <div class="row" id="contenedor-productos">
+        <p class="text-center">Cargando productos...</p>
     </div>
 </div>
+
+<script>
+document.addEventListener("DOMContentLoaded", function () {
+    fetch("/api/b2b/products", {
+        headers: {
+            "Authorization": "Bearer {{ request.session.token|default:'' }}"
+        }
+    })
+    .then(response => {
+        if (!response.ok) {
+            throw new Error("Error al cargar productos. ¿Tienes sesión activa?");
+        }
+        return response.json();
+    })
+    .then(data => {
+        const contenedor = document.getElementById("contenedor-productos");
+        contenedor.innerHTML = "";  // Limpiar mensaje de "Cargando"
+
+        if (data.length === 0) {
+            contenedor.innerHTML = "<p class='text-center'>No hay productos disponibles para distribuidores en este momento.</p>";
+            return;
+        }
+
+        data.forEach(producto => {
+            const cardHTML = `
+            <div class="col-md-4 mb-4">
+                <div class="card h-100">
+                    <img src="${producto.imagen || '/static/img/default-product.jpg'}"
+                         class="card-img-top img-fluid"
+                         style="max-height: 200px; object-fit: contain;"
+                         alt="${producto.nombre}">
+                    <div class="card-body text-center">
+                        <h5 class="card-title">${producto.nombre}</h5>
+                        <p class="card-text text-success fw-bold">$${producto.precio_mayorista}</p>
+                        <p class="card-text"><strong>Stock:</strong> ${producto.stock_disponible}</p>
+                        <a href="/producto/${producto.id}/" class="btn btn-primary btn-sm">Ver más</a>
+                    </div>
+                </div>
+            </div>
+            `;
+            contenedor.innerHTML += cardHTML;
+        });
+    })
+    .catch(error => {
+        document.getElementById("contenedor-productos").innerHTML = `<p class="text-danger text-center">${error.message}</p>`;
+    });
+});
+</script>
 {% endblock %}
