@@ -49,11 +49,11 @@ def agregar_producto(request, producto_id):
     carrito = request.session.get('carrito', {})
     producto = get_object_or_404(Producto, id=producto_id)
 
-    # Elegir el precio según si es B2B
+
     if request.user.is_authenticated and request.user.is_b2b:
-        precio = float(producto.precio_mayorista)
+        precio = int(producto.precio_mayorista)
     else:
-        precio = float(producto.precio_unitario)
+        precio = int(producto.precio_unitario)
 
     if str(producto_id) in carrito:
         carrito[str(producto_id)]['cantidad'] += 1
@@ -66,16 +66,16 @@ def agregar_producto(request, producto_id):
 
     request.session['carrito'] = carrito
     messages.success(request, f"✅ {producto.nombre} fue añadido al carrito.")
-    return redirect('catalogo')
+    return redirect(request.META.get('HTTP_REFERER', 'catalogo'))
 
 def ver_carrito(request):
     carrito = request.session.get('carrito', {})
 
-    # Calculamos subtotal por producto
-    for item in carrito.values():
-        item['subtotal'] = item['precio'] * item['cantidad']
 
-    total = sum(item['subtotal'] for item in carrito.values())
+    for item in carrito.values():
+        item['subtotal'] = int(item['precio']) * item['cantidad']
+
+    total = sum(int(item['subtotal']) for item in carrito.values())
 
     return render(request, 'tienda/carrito.html', {'carrito': carrito, 'total': total})
 
@@ -100,7 +100,7 @@ def checkout(request):
             "title": item['nombre'],
             "quantity": int(item['cantidad']),
             "currency_id": "CLP",
-            "unit_price": float(item['precio']),
+            "unit_price": int(item['precio']),
         })
 
     sdk = mercadopago.SDK(settings.MERCADO_PAGO_ACCESS_TOKEN)

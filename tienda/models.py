@@ -42,21 +42,23 @@ class Categoria(models.Model):
 
 # Modelo de Producto (productos_producto)
 class Producto(models.Model):
-    codigo_producto = models.CharField(max_length=100, unique=True, default="Sin código")  # Valor predeterminado
+    codigo_producto = models.CharField(max_length=100, unique=True, default="Sin código") 
     marca = models.CharField(max_length=100)
     nombre = models.CharField(max_length=100)
     descripcion = models.TextField()
-    precio_unitario = models.DecimalField(max_digits=10, decimal_places=2, default=0.0)  # Valor predeterminado
-    precio_mayorista = models.DecimalField(max_digits=10, decimal_places=2, default=0.0)  # Valor predeterminado
-    impuesto = models.DecimalField(max_digits=10, decimal_places=2, default=0.0)  # Valor predeterminado
-    stock_disponible = models.IntegerField(default=0)  # Valor predeterminado
-    unidad_medida = models.CharField(max_length=50, default="unidad")  # Valor predeterminado
+    precio_unitario = models.IntegerField(default=0)
+    precio_mayorista = models.IntegerField(default=0)
+    impuesto = models.IntegerField(default=0)
+    stock_disponible = models.IntegerField(default=0)  
+    unidad_medida = models.CharField(max_length=50, default="unidad")  
     activo = models.BooleanField(default=True)
     fecha_creacion = models.DateTimeField(auto_now_add=True)
-    autor = models.ForeignKey(CustomUser, on_delete=models.CASCADE)  # Relación con el autor (usuario)
+    fecha_actualizacion = models.DateTimeField(auto_now=True)
+    autor = models.ForeignKey(CustomUser, on_delete=models.CASCADE)  
     imagen = models.ImageField(upload_to='productos/', null=True, blank=True)
     categoria = models.ForeignKey(Categoria, on_delete=models.CASCADE, null=True, blank=True)
     destacado = models.BooleanField(default=False)
+    
     
     def __str__(self):
         return self.nombre
@@ -77,6 +79,7 @@ class Pedido(models.Model):
     tipo_entrega = models.CharField(max_length=50, choices=[('retiro', 'Retiro'), ('domicilio', 'Domicilio')])
     direccion_entrega = models.CharField(max_length=255, blank=True, null=True, default="No especificado")
     fecha_creacion = models.DateTimeField(auto_now_add=True)
+    fecha_actualizacion = models.DateTimeField(auto_now=True)
     estado = models.CharField(max_length=20, choices=ESTADOS_PEDIDO, default='pendiente')
 
     # ✅ Campo para subir comprobante de transferencia
