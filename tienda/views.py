@@ -293,6 +293,12 @@ def login_view(request):
 
         if user is not None:
             login(request, user)
+        
+            #token
+            from rest_framework.authtoken.models import Token
+            token, _ = Token.objects.get_or_create(user=user)
+            request.session['token'] = token.key 
+
             return redirect('home')
         else:
             messages.error(request, 'Correo o contraseña incorrectos.')
