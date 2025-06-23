@@ -21,6 +21,7 @@ from rest_framework.generics import RetrieveAPIView
 from rest_framework.parsers import MultiPartParser, FormParser
 from functools import wraps
 from django.db.models import Q
+from .forms import CustomRegisterForm
 # Create your views here.
 
 def home(request):
@@ -334,37 +335,33 @@ SECCIONES = {
 
 User = get_user_model()
 
+from .forms import CustomRegisterForm
+
 def register_view(request):
     if request.method == 'POST':
-        email = request.POST['email']
-        password1 = request.POST['password1']
-        password2 = request.POST['password2']
-        nombre = request.POST.get('nombre')
-        apellido = request.POST.get('apellido')
-        rut = request.POST.get('rut')
-        telefono = request.POST.get('telefono')
-        is_b2b_raw = request.POST.get('is_b2b')
-        is_b2b = is_b2b_raw in ['true', 'True', 'on', '1']
-
-        if password1 != password2:
-            messages.error(request, "Las contraseñas no coinciden.")
-        elif User.objects.filter(email=email).exists():
-            messages.error(request, "Este email ya está registrado.")
-        else:
+        form = CustomRegisterForm(request.POST)
+        if form.is_valid():
+            data = form.cleaned_data
             user = User.objects.create_user(
-                username=email,
-                email=email,
-                password=password1,
-                is_b2b=is_b2b,
-                nombre=nombre,
-                apellido=apellido,
-                rut=rut,
-                telefono=telefono,
+                username=data['email'],
+                email=data['email'],
+                password=data['password1'],
+                is_b2b=data['is_b2b'],
+                nombre=data['nombre'],
+                apellido=data['apellido'],
+                rut=data['rut'],
+                telefono=data['telefono'],
             )
             login(request, user)
             return redirect('home')
+        else:
+            for error in form.errors.values():
+                messages.error(request, error)
+    else:
+        form = CustomRegisterForm()
 
-    return render(request, 'tienda/register.html')
+    return render(request, 'tienda/register.html', {'form': form})
+
 
 
 

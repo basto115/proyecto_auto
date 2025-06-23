@@ -5,44 +5,133 @@
 <div class="row justify-content-center">
     <div class="col-md-6">
         <h2 class="text-center mt-5 mb-4">Crear una cuenta</h2>
-        <form method="post">
+        <form method="post" novalidate>
             {% csrf_token %}
+
             <div class="form-group">
                 <label>Email</label>
-                <input type="email" name="email" class="form-control" required>
+                <input type="email" name="email" class="form-control" required placeholder=" ejemplo@gmail.com" oninput="validarEmail(this)">
+                <small id="emailError" class="text-danger"></small>
             </div>
+
             <div class="form-group">
                 <label>Contraseña</label>
-                <input type="password" name="password1" class="form-control" required>
+                <input type="password" name="password1" class="form-control" required placeholder="Mínimo 8 caracteres, letras, número y símbolo" oninput="validarPassword(this)">
+                <small id="password1Error" class="text-danger"></small>
             </div>
+
             <div class="form-group">
                 <label>Repetir contraseña</label>
-                <input type="password" name="password2" class="form-control" required>
+                <input type="password" name="password2" class="form-control" required placeholder="Repite la contraseña" oninput="validarCoincidencia()">
+                <small id="password2Error" class="text-danger"></small>
             </div>
+
             <div class="form-group">
                 <label for="nombre">Nombre</label>
-                <input type="text" name="nombre" class="form-control" required>
+                <input type="text" name="nombre" class="form-control" required placeholder="Tu nombre">
             </div>
+
             <div class="form-group">
                 <label for="apellido">Apellido</label>
-                <input type="text" name="apellido" class="form-control" required>
+                <input type="text" name="apellido" class="form-control" required placeholder="Tu apellido">
             </div>
+
             <div class="form-group">
                 <label for="rut">RUT</label>
-                <input type="text" name="rut" class="form-control" required>
+                <input type="text" name="rut" class="form-control" required placeholder="Ej: 12345678-5"
+                oninput="validarRut(this)" onkeypress="bloquearPuntos(event)" onpaste="limpiarPegado(event)">
+                <small id="rutError" class="text-danger"></small>
             </div>
+
             <div class="form-group">
                 <label for="telefono">Teléfono</label>
-                <input type="text" name="telefono" class="form-control" required>
+                <input type="text" name="telefono" class="form-control" required placeholder="Solo números, mínimo 9 dígitos" oninput="validarTelefono(this)">
+                <small id="telefonoError" class="text-danger"></small>
             </div>
 
             <div class="form-group form-check">
-            <input type="checkbox" name="is_b2b" id="is_b2b" class="form-check-input">
-            <label class="form-check-label" for="is_b2b">¿Eres cliente B2B?</label>
+                <input type="checkbox" name="is_b2b" id="is_b2b" class="form-check-input">
+                <label class="form-check-label" for="is_b2b">¿Eres cliente B2B?</label>
             </div>
 
             <button type="submit" class="btn btn-primary btn-block">Registrarse</button>
         </form>
+
+
+        <script>
+        function validarEmail(input) {
+            const error = document.getElementById("emailError");
+            if (!input.value.endsWith("@gmail.com")) {
+                error.textContent = "El correo debe ser de Gmail.";
+            } else {
+                error.textContent = "";
+            }
+        }
+
+        function validarPassword(input) {
+            const error = document.getElementById("password1Error");
+            const regex = /^(?=.*[A-Za-z])(?=.*\d)(?=.*[\W_]).{8,}$/;
+            if (!regex.test(input.value)) {
+                error.textContent = "Debe tener mínimo 8 caracteres, con letra, número y símbolo.";
+            } else {
+                error.textContent = "";
+            }
+            validarCoincidencia();
+        }
+
+        function validarCoincidencia() {
+            const pass1 = document.querySelector("input[name='password1']").value;
+            const pass2 = document.querySelector("input[name='password2']").value;
+            const error = document.getElementById("password2Error");
+            if (pass1 && pass2 && pass1 !== pass2) {
+                error.textContent = "Las contraseñas no coinciden.";
+            } else {
+                error.textContent = "";
+            }
+        }
+
+        function validarRut(input) {
+            const error = document.getElementById("rutError");
+            const valor = input.value.toUpperCase().replace(/\./g, '');
+
+            // Solo formato: números + guion + dígito o K
+            const rutRegex = /^[0-9]{7,8}-[0-9K]$/;
+
+            if (!rutRegex.test(valor)) {
+                error.textContent = "Formato inválido";
+            } else {
+                error.textContent = "";
+            }
+        }
+
+        function validarTelefono(input) {
+            const error = document.getElementById("telefonoError");
+            const valor = input.value.trim();
+
+            if (!/^\d+$/.test(valor)) {
+                error.textContent = "El teléfono solo debe contener números.";
+            } else if (valor.length < 9) {
+                error.textContent = "El teléfono debe tener al menos 9 dígitos.";
+            } else {
+                error.textContent = "";
+            }
+        }
+
+        function bloquearPuntos(e) {
+            if (e.key === ".") {
+                e.preventDefault();  // Bloquea el punto
+            }
+        }
+
+        function limpiarPegado(e) {
+            e.preventDefault();
+            const texto = (e.clipboardData || window.clipboardData).getData('text');
+            const limpio = texto.replace(/\./g, '');  // Elimina puntos
+            document.execCommand("insertText", false, limpio);
+        }
+        </script>   
+
+
     </div>
 </div>
 {% endblock %}
