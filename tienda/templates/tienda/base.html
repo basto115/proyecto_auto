@@ -35,7 +35,7 @@
     <!-- Header -->
         <header class="header_area sticky-header">
         <div class="main_menu">
-            <nav class="navbar navbar-expand-lg navbar-light main_box">
+            <nav class="navbar navbar-expand-lg navbar-light main_box" style="background-color: #1f4e79;">
                 <div class="container">
                     <a class="navbar-brand logo_h" href="{% url 'home' %}">
                         <img src="{% static 'img/logo_auto.png' %}" alt="Logo" style="height: 60px; width: auto;">
@@ -51,7 +51,7 @@
                     <div class="collapse navbar-collapse offset" id="navbarSupportedContent">
                         <ul class="nav navbar-nav menu_nav ml-auto">
                             <li class="nav-item {% if request.path == '/' %}active{% endif %}">
-                                <a class="nav-link" href="{% url 'home' %}">Home</a>
+                                <a class="nav-link" href="{% url 'home' %}">Inicio</a>
                             </li>
                             <li class="nav-item {% if 'repuestos' in request.path %}active{% endif %}">
                                 <a class="nav-link" href="{% url 'catalogo' %}">Catalogo</a>
@@ -95,19 +95,24 @@
 
 
                         </ul>
-
-                        <ul class="nav navbar-nav navbar-right">
-                            <li class="nav-item">
-                                <a href="{% url 'ver_carrito' %}" class="cart"><span class="ti-bag"></span></a>
-                            </li>
-                        </ul>
+                        <a href="{% url 'ver_carrito' %}" class="nav-link cart">
+                            <span class="ti-bag"></span>
+                        </a>
                     </div>
                 </div>
             </nav>
+            <div class="search-bar-container">
+                <form method="GET" action="{% url 'buscar_productos' %}" class="search-form">
+                    <input type="text" name="q" placeholder="¿Qué estás buscando?" class="search-input" required>
+                    <button type="submit" class="search-btn">
+                        <i class="ti-search"></i>
+                    </button>
+                </form>
+            </div>
         </div>
     </header>
 
-    <!-- Mensajes (una sola vez) -->
+
     {% if messages %}
         <div class="container mt-3">
             {% for message in messages %}
@@ -121,17 +126,17 @@
         </div>
     {% endif %}
 
-    <!-- Contenido dinámico -->
+
     <main class="container mt-4">
         {% block content %}
         {% endblock %}
     </main>
 
-    <!-- Footer -->
+
     {% include 'tienda/partials/footer.html' %}
 
 
-    <!-- Scripts -->
+
     <script src="{% static 'js/vendor/jquery-2.2.4.min.js' %}"></script>
     <script src="{% static 'js/vendor/bootstrap.min.js' %}"></script>
     <script src="{% static 'js/jquery.ajaxchimp.min.js' %}"></script>

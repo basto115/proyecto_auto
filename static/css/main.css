@@ -5791,3 +5791,65 @@ label {
     color: #ffba00; }
 
 /*# sourceMappingURL=main.css.map */
+
+.navbar .nav-link {
+    color: #cccccc !important;
+    transition: color 0.3s ease;
+}
+
+.navbar .nav-link:hover,
+.navbar .nav-link:focus {
+    color: rgb(245, 167, 23) !important;
+}
+
+.navbar .nav-item.active .nav-link {
+    color: rgb(245, 167, 23) !important;
+    font-weight: bold;
+}
+
+.navbar .cart {
+    color: #cccccc !important;
+    transition: color 0.3s ease;
+}
+
+.navbar .cart:hover {
+    color: rgb(245, 167, 23) !important;
+}
+
+.search-bar-container {
+    background-color: #fff;
+    padding: 12px 20px;
+    box-shadow: 0 2px 6px rgba(0,0,0,0.1);
+    display: flex;
+    justify-content: center;
+}
+
+.search-form {
+    display: flex;
+    width: 100%;
+    max-width: 600px;
+    border: 1px solid #ccc;
+    border-radius: 8px;
+    overflow: hidden;
+}
+
+.search-input {
+    flex: 1;
+    border: none;
+    padding: 10px 15px;
+    font-size: 14px;
+    outline: none;
+}
+
+.search-btn {
+    background-color: transparent;
+    border: none;
+    padding: 0 15px;
+    cursor: pointer;
+    color: #555;
+    font-size: 16px;
+}
+
+.search-btn:hover {
+    color: #f6cd72;
+}

@@ -29,7 +29,9 @@
     <div class="col-md-4 mb-4">
         <div class="card h-100">
         {% if producto.imagen %}
-            <img src="{{ producto.imagen.url }}" class="card-img-top img-fluid" style="max-height: 200px; object-fit: contain;" alt="{{ producto.nombre }}">
+            <a href="{% url 'detalle_producto' producto.id %}">
+                <img src="{{ producto.imagen.url }}" class="card-img-top img-fluid" style="max-height: 200px; object-fit: contain;" alt="{{ producto.nombre }}">
+            </a>
         {% else %}
             <img src="{% static 'img/default-product.jpg' %}" class="card-img-top img-fluid" style="max-height: 200px; object-fit: contain;" alt="Sin imagen">
         {% endif %}
@@ -43,7 +45,7 @@
             {% endif %}
             </p>
             <a href="{% url 'agregar_producto' producto.id %}" class="btn btn-success btn-sm mb-2">Agregar al carrito</a>
-            <a href="{% url 'detalle_producto' producto.id %}" class="btn btn-primary btn-sm">Ver más</a>
+            
         </div>
         </div>
     </div>

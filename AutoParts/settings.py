@@ -40,6 +40,7 @@ INSTALLED_APPS = [
     'tienda',
     'rest_framework',
     'rest_framework.authtoken',
+    'django.contrib.humanize',
     
 ]
 

@@ -100,8 +100,45 @@
         {% if producto.stock_disponible > 0 %}
         <form method="POST" action="{% url 'agregar_producto' producto.id %}">
             {% csrf_token %}
+            <div class="d-flex align-items-center mb-3">
+                <label for="cantidad" class="me-2 fw-bold">Cantidad:</label>
+                <button type="button" onclick="cambiarCantidad(-1)" class="btn btn-outline-secondary">–</button>
+                <input type="number" id="cantidad" name="cantidad" value="1" min="1" max="{{ producto.stock_disponible }}"
+                    class="form-control mx-2" style="width: 60px;"
+                    oninput="if (this.value > {{ producto.stock_disponible }}) this.value = {{ producto.stock_disponible }}">
+                <button type="button" onclick="cambiarCantidad(1)" class="btn btn-outline-secondary">+</button>
+            </div>
+            <p id="stock-restante" class="text-muted mt-1"></p>
             <button type="submit" class="btn-cart">Agregar al carrito</button>
         </form>
+
+        <script>
+        function cambiarCantidad(delta) {
+            const input = document.getElementById("cantidad");
+            const max = parseInt(input.max);
+            let value = parseInt(input.value);
+            value = isNaN(value) ? 1 : value + delta;
+            if (value < 1) value = 1;
+            if (value > max) value = max;
+            input.value = value;
+            actualizarStockRestante();
+        }
+
+        function actualizarStockRestante() {
+            const stock = parseInt(document.getElementById("cantidad").max);
+            const seleccionada = parseInt(document.getElementById("cantidad").value);
+            const restante = stock - seleccionada;
+            const mensaje = restante >= 0 
+                ? `Quedarán ${restante} unidad(es) en stock después de esta compra.` 
+                : `⚠️ Has excedido el stock disponible.`;
+            const texto = document.getElementById("stock-restante");
+            texto.textContent = mensaje;
+            texto.style.color = restante < 0 ? "red" : "#666";
+        }
+
+        document.addEventListener("DOMContentLoaded", actualizarStockRestante);
+
+        </script>
         {% endif %}
     </div>
 </div>

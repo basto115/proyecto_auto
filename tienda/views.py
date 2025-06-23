@@ -20,6 +20,7 @@ from .serializers import CustomUserRegisterSerializer, ProductoSerializer, Pedid
 from rest_framework.generics import RetrieveAPIView
 from rest_framework.parsers import MultiPartParser, FormParser
 from functools import wraps
+from django.db.models import Q
 # Create your views here.
 
 def home(request):
@@ -46,27 +47,33 @@ def catalogo(request):
 
 
 def agregar_producto(request, producto_id):
-    carrito = request.session.get('carrito', {})
     producto = get_object_or_404(Producto, id=producto_id)
+    cantidad = int(request.POST.get('cantidad', 1))
 
+    if cantidad > producto.stock_disponible:
+        messages.error(request, "No puedes agregar más unidades que el stock disponible.")
+        return redirect(request.META.get('HTTP_REFERER', 'catalogo'))
 
-    if request.user.is_authenticated and request.user.is_b2b:
+    carrito = request.session.get('carrito', {})
+
+    if request.user.is_authenticated and getattr(request.user, 'is_b2b', False):
         precio = int(producto.precio_mayorista)
     else:
         precio = int(producto.precio_unitario)
 
     if str(producto_id) in carrito:
-        carrito[str(producto_id)]['cantidad'] += 1
+        carrito[str(producto_id)]['cantidad'] += cantidad
     else:
         carrito[str(producto_id)] = {
             'nombre': producto.nombre,
             'precio': precio,
-            'cantidad': 1,
+            'cantidad': cantidad,
         }
 
     request.session['carrito'] = carrito
-    messages.success(request, f"✅ {producto.nombre} fue añadido al carrito.")
+    messages.success(request, f"✅ {cantidad} unidad(es) de {producto.nombre} añadida(s) al carrito.")
     return redirect(request.META.get('HTTP_REFERER', 'catalogo'))
+
 
 def ver_carrito(request):
     carrito = request.session.get('carrito', {})
@@ -561,4 +568,14 @@ def vista_distribuidores(request):
     return render(request, 'tienda/productos_b2b.html', {
         'productos': productos,
         'modo_b2b': True,
+    })
+
+def buscar_productos(request):
+    query = request.GET.get('q')
+    resultados = Producto.objects.filter(
+        Q(nombre__icontains=query) | Q(descripcion__icontains=query)
+    )
+    return render(request, 'tienda/buscar_resultados.html', {
+        'resultados': resultados,
+        'query': query,
     })

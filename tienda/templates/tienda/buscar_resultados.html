@@ -1,0 +1,33 @@
+{% extends 'tienda/base.html' %}
+{% load humanize %}
+
+{% block content %}
+<div class="container mt-5">
+    <h2 class="mb-4" style="visibility: hidden;">placeholder</h2>
+    {% if resultados %}
+        <div class="row">
+            {% for producto in resultados %}
+                <div class="col-md-4 mb-4">
+                    <div class="card h-100">
+                        <a href="{% url 'detalle_producto' producto.id %}">
+                            <img src="{{ producto.imagen.url }}" class="card-img-top img-fluid" style="max-height: 200px; object-fit: contain;" alt="{{ producto.nombre }}">
+                        </a>
+                        <div class="card-body text-center">
+                            <h5 class="card-title">{{ producto.nombre }}</h5>
+                            <p class="card-text text-success">
+                                ${{ producto.precio_mayorista|intcomma }}
+                            </p>
+                            <p class="text-muted"><strong>Stock:</strong> {{ producto.stock_disponible }}</p>
+                            <a href="{% url 'detalle_producto' producto.id %}" class="btn btn-primary">Ver más</a>
+                        </div>
+                    </div>
+                </div>
+            {% endfor %}
+        </div>
+    {% else %}
+        <div class="alert alert-warning" role="alert">
+            No se encontraron productos que coincidan con tu búsqueda.
+        </div>
+    {% endif %}
+</div>
+{% endblock %}
