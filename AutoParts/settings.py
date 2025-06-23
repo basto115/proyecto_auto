@@ -44,6 +44,16 @@ INSTALLED_APPS = [
     
 ]
 
+REST_FRAMEWORK = {
+    'DEFAULT_AUTHENTICATION_CLASSES': [
+        'rest_framework.authentication.TokenAuthentication',
+    ],
+    'DEFAULT_PERMISSION_CLASSES': [
+        'rest_framework.permissions.IsAuthenticated',
+    ]
+}
+
+
 MIDDLEWARE = [
     'django.middleware.security.SecurityMiddleware',
     'django.contrib.sessions.middleware.SessionMiddleware',
@@ -137,3 +147,8 @@ MEDIA_ROOT = BASE_DIR / 'media'
 #Mercadopago
 
 MERCADO_PAGO_ACCESS_TOKEN = "TEST-2503451685170062-053119-ca3c6e493e1d1e83680dac41e9c92843-194855140"
+
+AUTHENTICATION_BACKENDS = [
+    'tienda.backends.EmailBackend', 
+    'django.contrib.auth.backends.ModelBackend',
+]
