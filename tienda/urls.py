@@ -1,7 +1,7 @@
 
 from django.urls import path
 from . import views
-from .views import realizar_pedido, login_view, register_view, logout_view, RegisterUserView, PedidosPorUsuarioView, CrearPedidoPorEmailView, CrearPedidoPorIDView
+from .views import realizar_pedido, login_view, register_view, logout_view, RegisterUserView, PedidosPorUsuarioView, CrearPedidoPorEmailView, CrearPedidoPorIDView, GenerarCotizacionPDF
 from .views import ProductoDetalleView, HistorialPedidosView, ActualizarEstadoPedidoView, SubirComprobanteView, PedidosPendientesView, B2BProductsView, vista_distribuidores, PedidoDetalleView, LoginView
 
 urlpatterns = [
@@ -52,6 +52,7 @@ urlpatterns = [
     path('api/b2b/products', B2BProductsView.as_view(), name='b2b_products'),
     path('api/pedidos/<int:pedido_id>/', PedidoDetalleView.as_view(), name='detalle_pedido'),
     path('api/auth/login/', LoginView.as_view(), name='api_login'),
+    path('api/pedidos/<int:pedido_id>/cotizacion_pdf/', GenerarCotizacionPDF.as_view(), name='cotizacion_pdf'),
     
 
     path('distribuidores/', vista_distribuidores, name='vista_distribuidores'),

@@ -1,5 +1,5 @@
 from django.shortcuts import render, redirect
-from django.http import HttpResponse
+from django.http import HttpResponse, Http404
 from .models import Producto, Pedido, PedidoProducto, CustomUser
 import requests
 from django.contrib import messages
@@ -27,6 +27,8 @@ from rest_framework.permissions import IsAuthenticated
 from rest_framework.authtoken.views import ObtainAuthToken
 from rest_framework.authtoken.models import Token
 from rest_framework.permissions import AllowAny
+from reportlab.pdfgen import canvas
+from reportlab.lib.pagesizes import letter
 
 
 # Create your views here.
@@ -603,3 +605,65 @@ class LoginView(APIView):
             return Response({'token': token.key})
         else:
             return Response({'error': 'Credenciales inválidas'}, status=status.HTTP_401_UNAUTHORIZED)
+        
+class GenerarCotizacionPDF(APIView):
+    permission_classes = [IsAuthenticated]
+
+class GenerarCotizacionPDF(APIView):
+    permission_classes = [IsAuthenticated]
+
+    def get(self, request, pedido_id):
+        try:
+            pedido = Pedido.objects.get(id=pedido_id)
+        except Pedido.DoesNotExist:
+            raise Http404("Pedido no encontrado")
+
+        if request.user != pedido.cliente and not request.user.is_staff:
+            return Response({'error': 'No autorizado'}, status=403)
+
+        
+        response = HttpResponse(content_type='application/pdf')
+        response['Content-Disposition'] = f'attachment; filename="cotizacion_pedido_{pedido.id}.pdf"'
+
+        
+        p = canvas.Canvas(response, pagesize=letter)
+        width, height = letter
+        y = height - 50
+
+        p.setFont("Helvetica-Bold", 14)
+        p.drawString(50, y, f"Cotización Pedido #{pedido.id}")
+        y -= 30
+
+        p.setFont("Helvetica", 12)
+        p.drawString(50, y, f"Cliente: {pedido.cliente.nombre}")
+        y -= 20
+        p.drawString(50, y, f"RUT: {pedido.cliente.rut}")
+        y -= 20
+        p.drawString(50, y, f"Email: {pedido.cliente.email}")
+        y -= 30
+        p.drawString(50, y, f"Tipo de Entrega: {pedido.tipo_entrega}")
+        y -= 20
+        p.drawString(50, y, f"Dirección: {pedido.direccion_entrega}")
+        y -= 30
+
+        p.drawString(50, y, "Productos:")
+        y -= 20
+
+        total = 0
+        for detalle in pedido.pedidoproducto_set.all():
+            subtotal = detalle.cantidad * detalle.producto.precio_unitario
+            total += subtotal
+            linea = f"- {detalle.producto.nombre}  ({detalle.cantidad} x ${detalle.producto.precio_unitario:,}) = ${subtotal:,}"
+            p.drawString(60, y, linea)
+            y -= 20
+            if y < 100:  
+                p.showPage()
+                y = height - 50
+
+        y -= 10
+        p.setFont("Helvetica-Bold", 12)
+        p.drawString(50, y - 10, f"Total: ${total:,}")
+        p.showPage()
+        p.save()
+
+        return response
