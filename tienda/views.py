@@ -12,16 +12,23 @@ import mercadopago
 from django.conf import settings
 from django.contrib.auth.decorators import login_required
 import json
-from django.contrib.auth import authenticate, login, get_user_model,logout
+from django.contrib.auth import authenticate, login, get_user_model, logout
+User = get_user_model()
 from rest_framework.views import APIView
 from rest_framework.response import Response
 from rest_framework import status
-from .serializers import CustomUserRegisterSerializer, ProductoSerializer, PedidoSerializer, PedidoHistorialSerializer, ComprobanteTransferenciaSerializer
+from .serializers import CustomUserRegisterSerializer, ProductoSerializer, PedidoSerializer, PedidoHistorialSerializer, ComprobanteTransferenciaSerializer, PedidoDetalleSerializer
 from rest_framework.generics import RetrieveAPIView
 from rest_framework.parsers import MultiPartParser, FormParser
 from functools import wraps
 from django.db.models import Q
 from .forms import CustomRegisterForm
+from rest_framework.permissions import IsAuthenticated
+from rest_framework.authtoken.views import ObtainAuthToken
+from rest_framework.authtoken.models import Token
+from rest_framework.permissions import AllowAny
+
+
 # Create your views here.
 
 def home(request):
@@ -171,7 +178,7 @@ def realizar_pedido(request):
 
 @login_required
 def pedidos_bodeguero(request):
-    pedidos = Pedido.objects.filter(estado='pagado')
+    pedidos = Pedido.objects.filter(estado__in=['pagado', 'recolectando'])
     return render(request, 'tienda/pedidos_bodeguero.html', {'pedidos': pedidos})
 
 @login_required
@@ -197,9 +204,7 @@ def marcar_entregado(request, pedido_id):
 
 
 
-def pedidos_bodeguero(request):
-    pedidos = Pedido.objects.filter(estado='recolectando')
-    return render(request, 'tienda/pedidos_bodeguero.html', {'pedidos': pedidos})
+
 
 def marcar_recolectado(request, pedido_id):
     pedido = get_object_or_404(Pedido, id=pedido_id)
@@ -367,7 +372,7 @@ def register_view(request):
 
 def logout_view(request):
     logout(request)
-    return redirect('home')  # O donde quieras redirigir
+    return redirect('home')  
 
 class RegisterUserView(APIView):
     def post(self, request):
@@ -377,14 +382,7 @@ class RegisterUserView(APIView):
             return Response({'message': 'Usuario registrado correctamente.'}, status=status.HTTP_201_CREATED)
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
     
-class ProductoDetailView(APIView):
-    def get(self, request, id):
-        try:
-            producto = Producto.objects.get(id=id)
-            serializer = ProductoSerializer(producto)
-            return Response(serializer.data)
-        except Producto.DoesNotExist:
-            return Response({'error': 'Producto no encontrado'}, status=status.HTTP_404_NOT_FOUND)
+
 
 
 class PedidosPorUsuarioView(APIView):
@@ -550,13 +548,10 @@ def rol_requerido(rol_permitido):
     return decorator
 
 class B2BProductsView(APIView):
+    permission_classes = [IsAuthenticated]
+
     def get(self, request):
-        user = request.user
-
-        if not user.is_authenticated:
-            return Response({'error': 'Autenticación requerida'}, status=status.HTTP_401_UNAUTHORIZED)
-
-        if not user.is_b2b:
+        if not getattr(request.user, 'is_b2b', False):
             return Response({'error': 'Acceso restringido a distribuidores B2B'}, status=status.HTTP_403_FORBIDDEN)
 
         productos = Producto.objects.filter(activo=True)
@@ -582,3 +577,29 @@ def buscar_productos(request):
         'resultados': resultados,
         'query': query,
     })
+
+        
+class PedidoDetalleView(APIView):
+    permission_classes = [IsAuthenticated]
+    
+    def get(self, request, pedido_id):
+        try:
+            pedido = Pedido.objects.get(id=pedido_id)
+            serializer = PedidoDetalleSerializer(pedido)
+            return Response(serializer.data)
+        except Pedido.DoesNotExist:
+            return Response({'error': 'Pedido no encontrado'}, status=status.HTTP_404_NOT_FOUND)
+        
+class LoginView(APIView):
+    permission_classes = [AllowAny]  
+
+    def post(self, request):
+        email = request.data.get('email')
+        password = request.data.get('password')
+
+        user = authenticate(request, username=email, password=password)
+        if user is not None:
+            token, created = Token.objects.get_or_create(user=user)
+            return Response({'token': token.key})
+        else:
+            return Response({'error': 'Credenciales inválidas'}, status=status.HTTP_401_UNAUTHORIZED)

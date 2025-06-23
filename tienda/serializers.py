@@ -36,7 +36,7 @@ class CustomUserRegisterSerializer(serializers.ModelSerializer):
 class ProductoSerializer(serializers.ModelSerializer):
     class Meta:
         model = Producto
-        fields = '__all__'
+        fields = ['id', 'nombre', 'precio_mayorista', 'stock_disponible', 'descripcion']
         
 class PedidoProductoSerializer(serializers.ModelSerializer):
     producto_nombre = serializers.CharField(source='producto.nombre', read_only=True)
@@ -66,8 +66,23 @@ class PedidoHistorialSerializer(serializers.ModelSerializer):
 
     def get_productos(self, obj):
         items = PedidoProducto.objects.filter(pedido=obj)
+        return PedidoProductoSerializer(items, many=True).data
 
 class ComprobanteTransferenciaSerializer(serializers.ModelSerializer):
     class Meta:
         model = Pedido
         fields = ['comprobante_transferencia']
+        
+class PedidoDetalleSerializer(serializers.ModelSerializer):
+    productos = serializers.SerializerMethodField()
+    cliente_email = serializers.EmailField(source='cliente.email', read_only=True)
+    cliente_nombre = serializers.CharField(source='cliente.nombre', read_only=True)
+    cliente_rut = serializers.CharField(source='cliente.rut', read_only=True)
+
+    class Meta:
+        model = Pedido
+        fields = ['id', 'cliente_nombre', 'cliente_rut', 'cliente_email', 'fecha_creacion', 'estado', 'tipo_entrega', 'direccion_entrega', 'productos']
+
+    def get_productos(self, obj):
+        productos = PedidoProducto.objects.filter(pedido=obj).select_related('producto')
+        return PedidoProductoSerializer(productos, many=True).data

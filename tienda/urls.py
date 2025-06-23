@@ -1,8 +1,8 @@
 
 from django.urls import path
 from . import views
-from .views import realizar_pedido, login_view, register_view, logout_view, RegisterUserView, ProductoDetailView, PedidosPorUsuarioView, CrearPedidoPorEmailView, CrearPedidoPorIDView
-from .views import ProductoDetalleView, HistorialPedidosView, ActualizarEstadoPedidoView, SubirComprobanteView, PedidosPendientesView, B2BProductsView, vista_distribuidores
+from .views import realizar_pedido, login_view, register_view, logout_view, RegisterUserView, PedidosPorUsuarioView, CrearPedidoPorEmailView, CrearPedidoPorIDView
+from .views import ProductoDetalleView, HistorialPedidosView, ActualizarEstadoPedidoView, SubirComprobanteView, PedidosPendientesView, B2BProductsView, vista_distribuidores, PedidoDetalleView, LoginView
 
 urlpatterns = [
     path('', views.home, name="home"),
@@ -39,9 +39,10 @@ urlpatterns = [
 
     
     path('api/register/', RegisterUserView.as_view(), name='api_register_user'),
-    path('api/products/<int:id>/', ProductoDetailView.as_view(), name='producto_detail'),
+    
+    
     path('api/pedidos/usuario/<int:user_id>/', PedidosPorUsuarioView.as_view(), name='pedidos_usuario'),
-    path('api/orders/', CrearPedidoPorIDView.as_view()),
+    path('api/orders/', CrearPedidoPorIDView.as_view(), name='crear_pedido'),
     path('api/pedidos/crear/', CrearPedidoPorEmailView.as_view()),
     path('api/products/<int:id>/', ProductoDetalleView.as_view(), name='producto_detalle'),
     path('api/pedidos/historial/', HistorialPedidosView.as_view(), name='historial_pedidos'),
@@ -49,11 +50,15 @@ urlpatterns = [
     path('api/pedidos/<int:pedido_id>/subir_comprobante/', SubirComprobanteView.as_view(), name='subir_comprobante'),
     path('api/pedidos/pendientes/', PedidosPendientesView.as_view(), name='pedidos_pendientes'),
     path('api/b2b/products', B2BProductsView.as_view(), name='b2b_products'),
+    path('api/pedidos/<int:pedido_id>/', PedidoDetalleView.as_view(), name='detalle_pedido'),
+    path('api/auth/login/', LoginView.as_view(), name='api_login'),
+    
 
     path('distribuidores/', vista_distribuidores, name='vista_distribuidores'),
     path('buscar/', views.buscar_productos, name='buscar_productos'),
     
     path('<str:seccion>/', views.catalogo_por_seccion, name='catalogo_por_seccion'),
+    
     
 
 ]
