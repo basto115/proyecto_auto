@@ -383,6 +383,7 @@ def logout_view(request):
     return redirect('home')  
 
 class RegisterUserView(APIView):
+    permission_classes = [AllowAny]
     def post(self, request):
         serializer = CustomUserRegisterSerializer(data=request.data)
         if serializer.is_valid():
