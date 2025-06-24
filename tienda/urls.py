@@ -1,13 +1,17 @@
 
 from django.urls import path
 from . import views
-from .views import realizar_pedido, login_view, register_view, logout_view, RegisterUserView, PedidosPorUsuarioView, CrearPedidoPorEmailView, CrearPedidoPorIDView, GenerarCotizacionPDF
-from .views import ProductoDetalleView, HistorialPedidosView, ActualizarEstadoPedidoView, SubirComprobanteView, PedidosPendientesView, B2BProductsView, vista_distribuidores, PedidoDetalleView, LoginView
+from .views import realizar_pedido, login_view, register_view, logout_view, RegisterUserView, PedidosPorUsuarioView, CrearPedidoPorEmailView, CrearPedidoPorIDView, GenerarCotizacionPDF, ProductoListView
+from .views import ProductoDetalleView, HistorialPedidosView, ActualizarEstadoPedidoView, SubirComprobanteView, PedidosPendientesView, B2BProductsView, vista_distribuidores, PedidoDetalleView, LoginView, EmailTokenObtainPairView
+from rest_framework_simplejwt.views import TokenRefreshView, TokenObtainPairView
+
 
 urlpatterns = [
     path('', views.home, name="home"),
     path('catalogo/', views.catalogo, name='catalogo'),
     path('blog/', views.blog, name="blog"),
+    
+    # HTML login (formulario web tradicional)
     path('login/', login_view, name="login"),
     path('register/', register_view, name='register'),
     path('checkout/', views.checkout, name="checkout"),
@@ -53,6 +57,11 @@ urlpatterns = [
     path('api/pedidos/<int:pedido_id>/', PedidoDetalleView.as_view(), name='detalle_pedido'),
     path('api/auth/login/', LoginView.as_view(), name='api_login'),
     path('api/pedidos/<int:pedido_id>/cotizacion_pdf/', GenerarCotizacionPDF.as_view(), name='cotizacion_pdf'),
+    path('api/products/', ProductoListView.as_view(), name='lista_productos'),
+    
+    path('api/login/', TokenObtainPairView.as_view(), name='token_obtain_pair'),
+    path('token/refresh/', TokenRefreshView.as_view(), name='token_refresh'),
+    path('api/login/', EmailTokenObtainPairView.as_view(), name='email_token_obtain_pair'),
     
 
     path('distribuidores/', vista_distribuidores, name='vista_distribuidores'),

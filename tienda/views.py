@@ -29,6 +29,12 @@ from rest_framework.authtoken.models import Token
 from rest_framework.permissions import AllowAny
 from reportlab.pdfgen import canvas
 from reportlab.lib.pagesizes import letter
+from rest_framework.generics import ListAPIView
+from rest_framework_simplejwt.views import TokenObtainPairView
+from rest_framework_simplejwt.serializers import TokenObtainPairSerializer
+from rest_framework import serializers
+from rest_framework.permissions import IsAuthenticated
+from rest_framework_simplejwt.authentication import JWTAuthentication
 
 
 # Create your views here.
@@ -463,6 +469,8 @@ class CrearPedidoPorIDView(APIView):
 class ProductoDetalleView(RetrieveAPIView):
     queryset = Producto.objects.all()
     serializer_class = ProductoSerializer
+    permission_classes = [IsAuthenticated]
+    authentication_classes = [JWTAuthentication]  
     lookup_field = 'id'
     
 class HistorialPedidosView(APIView):
@@ -667,3 +675,29 @@ class GenerarCotizacionPDF(APIView):
         p.save()
 
         return response
+
+class ProductoListView(ListAPIView):
+    queryset = Producto.objects.all()
+    serializer_class = ProductoSerializer
+    permission_classes = [AllowAny] 
+    
+
+class EmailTokenObtainPairSerializer(TokenObtainPairSerializer):
+    def validate(self, attrs):
+        email = attrs.get("email")
+        password = attrs.get("password")
+
+        try:
+            user = User.objects.get(email=email)
+        except User.DoesNotExist:
+            raise serializers.ValidationError("Email inválido")
+
+        if not user.check_password(password):
+            raise serializers.ValidationError("Contraseña incorrecta")
+
+        data = super().validate({"username": user.username, "password": password})
+        return data
+
+
+class EmailTokenObtainPairView(TokenObtainPairView):
+    serializer_class = EmailTokenObtainPairSerializer
