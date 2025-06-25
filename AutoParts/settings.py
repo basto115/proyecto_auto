@@ -152,3 +152,9 @@ AUTHENTICATION_BACKENDS = [
     'tienda.backends.EmailBackend', 
     'django.contrib.auth.backends.ModelBackend',
 ]
+
+#Chilexpress
+
+CHILEXPRESS_COTIZAR_API_KEY = "6cc71813b60947009cdc7675af41c269"
+
+CHILEXPRESS_GEOREF_API_KEY = '24c155a3df674deb91dea2889197b1a7'  

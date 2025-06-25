@@ -470,7 +470,7 @@ class CrearPedidoPorIDView(APIView):
 class ProductoDetalleView(RetrieveAPIView):
     queryset = Producto.objects.all()
     serializer_class = ProductoSerializer
-    permission_classes = [IsAuthenticated]
+    permission_classes = [AllowAny]
     authentication_classes = [JWTAuthentication]  
     lookup_field = 'id'
     
@@ -489,34 +489,56 @@ class HistorialPedidosView(APIView):
             return Response({'error': 'Usuario no encontrado'}, status=status.HTTP_404_NOT_FOUND)
 
 class ActualizarEstadoPedidoView(APIView):
+    permission_classes = [IsAuthenticated]
+    authentication_classes = [JWTAuthentication]
+
     def put(self, request, pedido_id):
         nuevo_estado = request.data.get('estado')
 
         if not nuevo_estado:
             return Response({'error': 'Debe proporcionar el nuevo estado'}, status=status.HTTP_400_BAD_REQUEST)
 
+        # ✅ Validar estado permitido
+        estados_validos = [opcion[0] for opcion in Pedido.ESTADOS_PEDIDO]
+        if nuevo_estado not in estados_validos:
+            return Response({'error': 'Estado inválido'}, status=status.HTTP_400_BAD_REQUEST)
+
         try:
             pedido = Pedido.objects.get(id=pedido_id)
-            pedido.estado = nuevo_estado
-            pedido.save()
-            return Response({'mensaje': f'Estado del pedido actualizado a "{nuevo_estado}"'}, status=status.HTTP_200_OK)
+            
         except Pedido.DoesNotExist:
             return Response({'error': 'Pedido no encontrado'}, status=status.HTTP_404_NOT_FOUND)
 
+
+        if not request.user.is_staff:
+            return Response({'error': 'No tienes permisos para actualizar el estado'}, status=status.HTTP_403_FORBIDDEN)
+
+        pedido.estado = nuevo_estado
+        pedido.save()
+        return Response({'mensaje': f'Estado del pedido actualizado a "{nuevo_estado}"'}, status=status.HTTP_200_OK)
+
 class SubirComprobanteView(APIView):
     parser_classes = [MultiPartParser, FormParser]
+    permission_classes = [IsAuthenticated]
+    authentication_classes = [JWTAuthentication]
 
     def post(self, request, pedido_id):
         try:
             pedido = Pedido.objects.get(id=pedido_id)
         except Pedido.DoesNotExist:
-            return Response({"error": "Pedido no encontrado"}, status=status.HTTP_404_NOT_FOUND)
+            return Response({"error": "Pedido no encontrado"}, status=404)
 
-        serializer = ComprobanteTransferenciaSerializer(pedido, data=request.data, partial=True)
-        if serializer.is_valid():
-            serializer.save()
-            return Response({"mensaje": "Comprobante subido correctamente"}, status=status.HTTP_200_OK)
-        return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+        if pedido.cliente != request.user:
+            return Response({"error": "No autorizado para modificar este pedido"}, status=403)
+
+        archivo = request.FILES.get("comprobante")
+        if not archivo:
+            return Response({"error": "Archivo requerido"}, status=400)
+
+        pedido.comprobante_transferencia = archivo
+        pedido.save()
+
+        return Response({"mensaje": "Comprobante subido correctamente"}, status=200)
     
 class PedidosPendientesView(APIView):
     def get(self, request):
@@ -702,3 +724,67 @@ class EmailTokenObtainPairSerializer(TokenObtainPairSerializer):
 
 class EmailTokenObtainPairView(TokenObtainPairView):
     serializer_class = EmailTokenObtainPairSerializer
+    
+class CotizarEnvioChilexpressView(APIView):
+    permission_classes = [AllowAny]
+
+    def post(self, request):
+        data = request.data
+
+        payload = {
+            "originCountyCode": data.get("origen"),
+            "destinationCountyCode": data.get("destino"),
+            "package": {
+                "weight": data.get("peso"),
+                "height": data.get("alto"),
+                "width": data.get("ancho"),
+                "length": data.get("largo")
+            },
+            "productType": data.get("producto", 3),
+            "contentReference": data.get("referencia", "Cotización AutoParts")
+        }
+
+        headers = {
+            "Content-Type": "application/json",
+            "Accept": "application/json",
+            "Ocp-Apim-Subscription-Key": settings.CHILEXPRESS_COTIZAR_API_KEY
+        }
+
+        try:
+            url = "http://testservices.wschilexpress.com/rating/api/v1/rates/courier"
+            response = requests.post(url, json=payload, headers=headers)
+            return Response(response.json(), status=response.status_code)
+        except Exception as e:
+            return Response({"error": str(e)}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
+
+class BuscarCalleGeoreferenciaChilexpressView(APIView):
+    permission_classes = [AllowAny]
+
+    def get(self, request):
+        nombre = request.GET.get("name")
+        limit = request.GET.get("limit", 10)
+
+        if not nombre:
+            return Response({"error": "Parámetro 'name' requerido."}, status=400)
+
+        url = "http://testservices.wschilexpress.com/georeference/api/v1/streets/search"
+        params = {
+            "name": nombre,
+            "limit": limit
+        }
+        headers = {
+            "Accept": "application/json",
+            "Ocp-Apim-Subscription-Key": settings.CHILEXPRESS_GEOREF_API_KEY
+        }
+
+        try:
+            response = requests.get(url, headers=headers, params=params)
+
+            
+            print("URL solicitada a Chilexpress:", response.url)
+            print("Status Code:", response.status_code)
+            print("Respuesta:", response.text)
+
+            return Response(response.json(), status=response.status_code)
+        except Exception as e:
+            return Response({"error": str(e)}, status=500)

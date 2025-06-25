@@ -3,6 +3,7 @@ from django.urls import path
 from . import views
 from .views import realizar_pedido, login_view, register_view, logout_view, RegisterUserView, PedidosPorUsuarioView, CrearPedidoPorEmailView, CrearPedidoPorIDView, GenerarCotizacionPDF, ProductoListView
 from .views import ProductoDetalleView, HistorialPedidosView, ActualizarEstadoPedidoView, SubirComprobanteView, PedidosPendientesView, B2BProductsView, vista_distribuidores, PedidoDetalleView, LoginView, EmailTokenObtainPairView
+from .views import CotizarEnvioChilexpressView, BuscarCalleGeoreferenciaChilexpressView
 from rest_framework_simplejwt.views import TokenRefreshView, TokenObtainPairView
 
 
@@ -63,12 +64,14 @@ urlpatterns = [
     path('token/refresh/', TokenRefreshView.as_view(), name='token_refresh'),
     path('api/login/', EmailTokenObtainPairView.as_view(), name='email_token_obtain_pair'),
     
+    #chilexpress
+    path('api/chilexpress/cotizar/', CotizarEnvioChilexpressView.as_view(), name='cotizar_envio'),
 
     path('distribuidores/', vista_distribuidores, name='vista_distribuidores'),
     path('buscar/', views.buscar_productos, name='buscar_productos'),
     
     path('<str:seccion>/', views.catalogo_por_seccion, name='catalogo_por_seccion'),
-    
+    path('chilexpress/calles/', BuscarCalleGeoreferenciaChilexpressView.as_view(), name='buscar-calles-chilexpress'),
     
 
 ]
