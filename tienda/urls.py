@@ -27,7 +27,7 @@ urlpatterns = [
     path('eliminar/<int:producto_id>/', views.eliminar_producto, name='eliminar_producto'),
     path('vaciar/', views.vaciar_carrito, name='vaciar_carrito'),
 
-    path('confirmacion/', views.confirmacion_pago, name='confirmacion_pago'),
+
     path('producto/<int:producto_id>/', views.detalle_producto, name='detalle_producto'),
 
     # Bodeguero

@@ -58,7 +58,8 @@ def catalogo(request):
         'productos': productos,
         'categorias': categorias,
         'categoria_seleccionada': int(categoria_id) if categoria_id else None,
-        'modo_b2b': modo_b2b  
+        'modo_b2b': modo_b2b,
+        'mostrar_buscador' : True  
     })
 
 
@@ -153,11 +154,10 @@ def checkout(request):
         error = response_data.get("message", "No se pudo generar la preferencia de pago.")
         return render(request, 'tienda/checkout_error.html', {"error": error, "detalles": response_data})
 
-def confirmacion_pago(request):
-    request.session['carrito'] = {}  
-    return render(request, 'tienda/confirmacion.html')
+
 
 def confirmation(request):
+    request.session['carrito'] = {}  
     return render(request, 'tienda/confirmation.html')
 
 def single_product(request, producto_id):
@@ -336,7 +336,8 @@ def catalogo_por_seccion(request, seccion):
         'productos': productos,
         'categorias': categorias_nombres,
         'modo_b2b': modo_b2b,
-        'seccion': seccion.capitalize()
+        'seccion': seccion.capitalize(),
+        'mostrar_buscador' : True
     })
     
 SECCIONES = {

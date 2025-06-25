@@ -102,6 +102,7 @@
                     </div>
                 </div>
             </nav>
+            {% if mostrar_buscador %}
             <div class="search-bar-container">
                 <form method="GET" action="{% url 'buscar_productos' %}" class="search-form">
                     <input type="text" name="q" placeholder="¿Qué estás buscando?" class="search-input" required>
@@ -110,6 +111,7 @@
                     </button>
                 </form>
             </div>
+            {% endif %}
         </div>
     </header>
 
