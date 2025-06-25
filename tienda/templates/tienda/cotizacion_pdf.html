@@ -1,3 +1,4 @@
+{% load static %}
 <!DOCTYPE html>
 <html>
 <head>
@@ -11,7 +12,10 @@
     </style>
 </head>
 <body>
-    <h2>Cotización para {{ cliente.email }}</h2>
+    <div style="display: flex; align-items: center; justify-content: space-between;">
+        <img src="{{ logo_path }}" alt="AutoParts Logo" width="120">
+        <h2 style="margin-left: 20px;">Cotización para {{ cliente.nombre }} {{ cliente.apellido }}</h2>
+    </div>
 
     <table>
         <thead>

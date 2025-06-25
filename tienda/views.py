@@ -37,6 +37,7 @@ from rest_framework.permissions import IsAuthenticated
 from rest_framework_simplejwt.authentication import JWTAuthentication
 from django.template.loader import get_template
 from xhtml2pdf import pisa
+from django.templatetags.static import static
 
 
 
@@ -812,13 +813,15 @@ def generar_cotizacion(request):
 
         total_productos = sum(p['precio'] * p['cantidad'] for p in productos)
         total_final = total_productos + mano_obra
+        logo_path = request.build_absolute_uri(static('img/logo_auto.png'))
 
         context = {
             'productos': productos,
             'mano_obra': mano_obra,
             'total_productos': total_productos,
             'total_final': total_final,
-            'cliente': request.user
+            'cliente': request.user,
+            'logo_path': logo_path
         }
 
         template = get_template('tienda/cotizacion_pdf.html')
@@ -828,3 +831,5 @@ def generar_cotizacion(request):
         response['Content-Disposition'] = 'attachment; filename="cotizacion.pdf"'
         pisa.CreatePDF(html, dest=response)
         return response
+    
+    
