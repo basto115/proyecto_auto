@@ -35,6 +35,10 @@ from rest_framework_simplejwt.serializers import TokenObtainPairSerializer
 from rest_framework import serializers
 from rest_framework.permissions import IsAuthenticated
 from rest_framework_simplejwt.authentication import JWTAuthentication
+from django.template.loader import get_template
+from xhtml2pdf import pisa
+
+
 
 
 # Create your views here.
@@ -134,7 +138,7 @@ def checkout(request):
     preference_data = {
         "items": preference_items,
         "back_urls": {
-            "success": domain + reverse('confirmacion_pago'),
+            "success": domain + reverse('confirmation'),
             "failure": domain + reverse('ver_carrito'),
             "pending": domain + reverse('ver_carrito'),
         },
@@ -143,12 +147,22 @@ def checkout(request):
 
     preference_response = sdk.preference().create(preference_data)
     response_data = preference_response.get("response", {})
+    
+    productos = []
+    for item in carrito.values():
+        productos.append({
+            "nombre": item["nombre"],
+            "precio": int(item["precio"]),
+            "cantidad": int(item["cantidad"])
+        })
+    productos_json = json.dumps(productos)
 
     if "init_point" in response_data:
         return render(request, 'tienda/checkout.html', {
             'carrito': carrito,
             'init_point': response_data["init_point"],
-            'preference_id': response_data.get("id")
+            'preference_id': response_data.get("id"),
+            'productos_json': productos_json
         })
     else:
         error = response_data.get("message", "No se pudo generar la preferencia de pago.")
@@ -789,3 +803,28 @@ class BuscarCalleGeoreferenciaChilexpressView(APIView):
             return Response(response.json(), status=response.status_code)
         except Exception as e:
             return Response({"error": str(e)}, status=500)
+
+def generar_cotizacion(request):
+    if request.method == 'POST':
+        mano_obra = int(request.POST.get('mano_obra', 0))
+        productos_json = request.POST.get('productos_json', '[]')
+        productos = json.loads(productos_json)
+
+        total_productos = sum(p['precio'] * p['cantidad'] for p in productos)
+        total_final = total_productos + mano_obra
+
+        context = {
+            'productos': productos,
+            'mano_obra': mano_obra,
+            'total_productos': total_productos,
+            'total_final': total_final,
+            'cliente': request.user
+        }
+
+        template = get_template('tienda/cotizacion_pdf.html')
+        html = template.render(context)
+
+        response = HttpResponse(content_type='application/pdf')
+        response['Content-Disposition'] = 'attachment; filename="cotizacion.pdf"'
+        pisa.CreatePDF(html, dest=response)
+        return response

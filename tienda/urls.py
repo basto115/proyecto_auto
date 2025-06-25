@@ -72,6 +72,7 @@ urlpatterns = [
     
     path('<str:seccion>/', views.catalogo_por_seccion, name='catalogo_por_seccion'),
     path('chilexpress/calles/', BuscarCalleGeoreferenciaChilexpressView.as_view(), name='buscar-calles-chilexpress'),
+    path('cotizacion/generar/', views.generar_cotizacion, name='generar_cotizacion'),
     
 
 ]

@@ -43,5 +43,21 @@
     {% else %}
         <p>No hay productos en el carrito.</p>
     {% endif %}
+
+    <form method="POST" action="{% url 'generar_cotizacion' %}">
+        {% csrf_token %}
+
+        <div class="mt-4">
+            <label for="mano_obra"><strong>Precio mano de obra ($):</strong></label>
+            <input type="number" name="mano_obra" id="mano_obra" class="form-control w-25" min="0" step="100" required>
+        </div>
+
+
+        <input type="hidden" name="productos_json" value='{{ productos_json|safe }}'>
+
+        <button type="submit" class="btn btn-success mt-3">
+            Generar Cotización en PDF
+        </button>
+    </form>
 </div>
 {% endblock %}
