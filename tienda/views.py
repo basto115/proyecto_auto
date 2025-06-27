@@ -90,7 +90,10 @@ def agregar_producto(request, producto_id):
             'nombre': producto.nombre,
             'precio': precio,
             'cantidad': cantidad,
+            'codigo': producto.codigo_producto,
         }
+    
+    domain = "https://autoparts.pythonanywhere.com"
 
     request.session['carrito'] = carrito
     messages.success(request, f"✅ {cantidad} unidad(es) de {producto.nombre} añadida(s) al carrito.")
@@ -290,13 +293,21 @@ def realizar_pedido(request):
         }
 
         try:
+            token = request.session.get("token", "").strip()
+
+            if not token:
+                messages.error(request, "No se encontró el token de autenticación. Por favor inicia sesión.")
+                return redirect('login')
+
+            headers = {'Authorization': f'Bearer {token}'}
+
             response = requests.post(
                 'http://localhost:8000/api/orders/',
                 json=data,
-                headers={'Authorization': f'Bearer {request.session.get("token", "")}'}
+                headers=headers
             )
             if response.status_code in [200, 201]:
-                # Vaciar carrito después de pedido exitoso
+
                 request.session['carrito'] = {}
                 messages.success(request, 'Pedido realizado con éxito.')
                 return redirect('confirmation')
@@ -324,9 +335,9 @@ def login_view(request):
             login(request, user)
         
             #token
-            from rest_framework.authtoken.models import Token
-            token, _ = Token.objects.get_or_create(user=user)
-            request.session['token'] = token.key 
+            from rest_framework_simplejwt.tokens import RefreshToken
+            refresh = RefreshToken.for_user(user)
+            request.session['token'] = str(refresh.access_token)
 
             return redirect('home')
         else:
