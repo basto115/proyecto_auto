@@ -34,7 +34,15 @@
         </table>
         <h4>Total: ${{ total|default:0|floatformat:0 }}</h4>
         <a href="{% url 'vaciar_carrito' %}" class="btn btn-warning">Vaciar carrito</a>
+        {% if user.is_authenticated %}
         <a href="{% url 'realizar_pedido' %}" class="btn btn-success">Realizar pedido</a>
+        {% else %}
+        <a href="{% url 'login' %}" class="btn btn-secondary"
+            onclick="alert('Debes iniciar sesión para continuar con tu pedido.')">
+            Iniciar sesión para continuar
+        </a>
+        {% endif %}
+
     {% else %}
         <p>No tienes productos en el carrito.</p>
     {% endif %}

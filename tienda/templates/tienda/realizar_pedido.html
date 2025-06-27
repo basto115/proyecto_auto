@@ -68,10 +68,21 @@
             </script>
 
 
+            <script>
+                document.querySelector("form").addEventListener("submit", function (e) {
+                    const tipoEntrega = document.getElementById("id_tipo_entrega").value;
+                    const direccion = document.getElementById("id_direccion_entrega").value.trim();
             
+                    if (tipoEntrega === "envio" && direccion === "") {
+                        e.preventDefault();
+                        alert("Por favor ingresa una dirección de entrega.");
+                    }
+                });
+            </script>
+
 
             <input type="hidden" name="productos" id="productos">
-            <a href="{% url 'checkout' %}" class="btn btn-success">Finalizar compra</a>
+            <button type="submit" class="btn btn-success btn-block">Finalizar compra</button>
         </form>
     </div>
 </div>

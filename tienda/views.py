@@ -265,6 +265,9 @@ def detalle_producto(request, producto_id):
     })
 
 
+from django.contrib.auth.decorators import login_required
+
+@login_required
 def realizar_pedido(request):
     productos_json = "[]"
     carrito = request.session.get("carrito", {})
@@ -278,12 +281,16 @@ def realizar_pedido(request):
             for item in carrito.values()
         ])
 
-
     if request.method == 'POST':
         cliente_id = request.user.id
         tipo_entrega = request.POST.get('tipo_entrega')
         direccion = request.POST.get('direccion_entrega')
         productos = request.POST.get('productos')
+
+        # Validación de dirección requerida
+        if tipo_entrega == "envio" and not direccion:
+            messages.error(request, "Debes ingresar una dirección de entrega.")
+            return redirect('realizar_pedido')
 
         data = {
             "cliente_id": int(cliente_id),
@@ -306,8 +313,8 @@ def realizar_pedido(request):
                 json=data,
                 headers=headers
             )
-            if response.status_code in [200, 201]:
 
+            if response.status_code in [200, 201]:
                 request.session['carrito'] = {}
                 messages.success(request, 'Pedido realizado con éxito.')
                 return redirect('confirmation')
@@ -315,8 +322,6 @@ def realizar_pedido(request):
                 messages.error(request, f"Error al registrar pedido: {response.status_code} - {response.text}")
         except Exception as e:
             messages.error(request, f"Error al conectar con la API: {str(e)}")
-            
-            
 
     return render(request, 'tienda/realizar_pedido.html', {
         'productos_json': productos_json,
