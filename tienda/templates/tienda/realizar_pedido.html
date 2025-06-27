@@ -91,4 +91,17 @@
     const productosSeleccionados = JSON.parse('{{ productos_json|escapejs }}');
     document.getElementById('productos').value = JSON.stringify(productosSeleccionados);
 </script>
+
+<script>
+    document.getElementById("btnCheckout").addEventListener("click", function (e) {
+        const tipoEntrega = document.getElementById("id_tipo_entrega").value;
+        const direccion = document.getElementById("id_direccion_entrega").value.trim();
+
+        if (tipoEntrega === "envio" && direccion === "") {
+            e.preventDefault(); 
+            alert("⚠️ Debes ingresar una dirección de entrega para continuar.");
+        }
+    });
+</script>
+
 {% endblock %}

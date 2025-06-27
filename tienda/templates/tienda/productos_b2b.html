@@ -31,8 +31,7 @@ document.addEventListener("DOMContentLoaded", function () {
     })
     .then(data => {
         const contenedor = document.getElementById("contenedor-productos");
-        contenedor.innerHTML = "";  // Limpiar mensaje de "Cargando"
-
+        contenedor.innerHTML = "";  
         if (data.length === 0) {
             contenedor.innerHTML = "<p class='text-center'>No hay productos disponibles para distribuidores en este momento.</p>";
             return;
@@ -42,15 +41,17 @@ document.addEventListener("DOMContentLoaded", function () {
             const cardHTML = `
             <div class="col-md-4 mb-4">
                 <div class="card h-100">
-                    <img src="${producto.imagen || '/static/img/default-product.jpg'}"
-                         class="card-img-top img-fluid"
-                         style="max-height: 200px; object-fit: contain;"
-                         alt="${producto.nombre}">
+                    <a href="/producto/${producto.id}/">
+                        <img src="${producto.imagen || '/static/img/default-product.jpg'}"
+                            class="card-img-top img-fluid"
+                            style="max-height: 200px; object-fit: contain;"
+                            alt="${producto.nombre}">
+                    </a>
                     <div class="card-body text-center">
                         <h5 class="card-title">${producto.nombre}</h5>
                         <p class="card-text text-success fw-bold">$${producto.precio_mayorista}</p>
                         <p class="card-text"><strong>Stock:</strong> ${producto.stock_disponible}</p>
-                        <a href="/producto/${producto.id}/" class="btn btn-primary btn-sm">Ver más</a>
+                        <a href="/agregar/${producto.id}/" class="btn btn-success btn-sm mb-2">Agregar al carrito</a>
                     </div>
                 </div>
             </div>

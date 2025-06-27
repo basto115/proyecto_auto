@@ -56,9 +56,16 @@ class CustomUserRegisterSerializer(serializers.ModelSerializer):
 
 
 class ProductoSerializer(serializers.ModelSerializer):
+    imagen = serializers.SerializerMethodField()
+
     class Meta:
         model = Producto
-        fields = ['id', 'codigo_producto', 'marca', 'nombre', 'precio_mayorista', 'stock_disponible', 'unidad_medida', 'descripcion']
+        fields = ['id', 'codigo_producto', 'marca', 'nombre', 'precio_mayorista', 'stock_disponible', 'unidad_medida', 'descripcion', 'imagen']
+
+    def get_imagen(self, obj):
+        if obj.imagen:
+            return obj.imagen.url  
+        return None
         
 class PedidoProductoSerializer(serializers.ModelSerializer):
     producto_nombre = serializers.CharField(source='producto.nombre', read_only=True)
