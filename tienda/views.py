@@ -381,6 +381,7 @@ def register_view(request):
                 rut=data['rut'],
                 telefono=data['telefono'],
             )
+            user.backend = 'tienda.backends.EmailBackend'
             login(request, user)
             return redirect('home')
         else:
