@@ -291,7 +291,7 @@ def realizar_pedido(request):
 
         try:
             response = requests.post(
-                'http://localhost:8000/api/orders',
+                'http://localhost:8000/api/orders/',
                 json=data,
                 headers={'Authorization': f'Bearer {request.session.get("token", "")}'}
             )
@@ -299,7 +299,7 @@ def realizar_pedido(request):
                 # Vaciar carrito después de pedido exitoso
                 request.session['carrito'] = {}
                 messages.success(request, 'Pedido realizado con éxito.')
-                return redirect('checkout')
+                return redirect('confirmation')
             else:
                 messages.error(request, f"Error al registrar pedido: {response.status_code} - {response.text}")
         except Exception as e:

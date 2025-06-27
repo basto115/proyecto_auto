@@ -34,7 +34,7 @@
         </table>
         <h4>Total: ${{ total|default:0|floatformat:0 }}</h4>
         <a href="{% url 'vaciar_carrito' %}" class="btn btn-warning">Vaciar carrito</a>
-        <a href="{% url 'checkout' %}" class="btn btn-success">Finalizar compra</a>
+        <a href="{% url 'realizar_pedido' %}" class="btn btn-success">Finalizar compra</a>
     {% else %}
         <p>No tienes productos en el carrito.</p>
     {% endif %}
