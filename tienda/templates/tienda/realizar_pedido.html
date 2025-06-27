@@ -36,15 +36,36 @@
             <!-- Campos del pedido -->
             <div class="form-group">
                 <label for="id_tipo_entrega">Tipo de entrega</label>
-                <select name="tipo_entrega" class="form-control" id="id_tipo_entrega">
+                <select name="tipo_entrega" class="form-control" id="id_tipo_entrega" onchange="toggleDireccionEntrega()">
                     <option value="retiro">Retiro en tienda</option>
                     <option value="envio">Envío a domicilio</option>
                 </select>
             </div>
-            <div class="form-group">
+            
+            <div class="form-group" id="direccion_entrega_group">
                 <label for="id_direccion_entrega">Dirección de entrega</label>
                 <input type="text" name="direccion_entrega" class="form-control" id="id_direccion_entrega">
             </div>
+
+            <script>
+                function toggleDireccionEntrega() {
+                    const tipoEntrega = document.getElementById('id_tipo_entrega').value;
+                    const direccionGroup = document.getElementById('direccion_entrega_group');
+                    const direccionInput = document.getElementById('id_direccion_entrega');
+            
+                    if (tipoEntrega === 'envio') {
+                        direccionGroup.style.display = 'block';
+                        direccionInput.required = true; 
+                    } else {
+                        direccionGroup.style.display = 'none';
+                        direccionInput.required = false; 
+                        direccionInput.value = ''; 
+                    }
+                }
+            
+                // Ejecutar al cargar la página
+                document.addEventListener('DOMContentLoaded', toggleDireccionEntrega);
+            </script>
 
 
             
