@@ -1,0 +1,47 @@
+{% load filtros humanize %}
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="utf-8">
+    <title>Comprobante de Compra</title>
+    <style>
+        body { font-family: Arial, sans-serif; font-size: 13px; }
+        table { width: 100%; border-collapse: collapse; margin-top: 15px; }
+        th, td { border: 1px solid #ccc; padding: 5px; text-align: left; }
+        h1 { text-align: center; }
+    </style>
+</head>
+<body>
+    <div style="display: flex; align-items: center; justify-content: space-between;">
+        <img src="{{ logo_path }}" alt="AutoParts Logo" width="120">
+    </div>
+    <h1>Comprobante de Compra</h1>
+    <p><strong>Número de Pedido:</strong> #{{ pedido.id }}</p>
+    <p><strong>Fecha:</strong> {{ pedido.fecha_creacion }}</p>
+    <p><strong>Cliente:</strong> {{ pedido.cliente.email }}</p>
+    {% if pedido.payment_id %}
+        <p><strong>ID de Pago:</strong> {{ pedido.payment_id }}</p>
+    {% endif %}
+
+    <table>
+        <tr>
+            <th>Producto</th>
+            <th>Código</th>
+            <th>Cantidad</th>
+            <th>Precio unitario</th>
+            <th>Subtotal</th>
+        </tr>
+        {% for item in productos %}
+        <tr>
+            <td>{{ item.producto.nombre }}</td>
+            <td>{{ item.producto.codigo_producto }}</td>
+            <td>{{ item.cantidad }}</td>
+            <td>${{ item.producto.precio_unitario }}</td>
+            <td>${{ item.producto.precio_unitario|multiply:item.cantidad|floatformat:0|intcomma }}</td>
+        </tr>
+        {% endfor %}
+    </table>
+
+    <p><strong>Total:</strong> ${{ total }}</p>
+</body>
+</html>

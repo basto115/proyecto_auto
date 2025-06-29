@@ -42,29 +42,29 @@ class Categoria(models.Model):
 
 # Modelo de Producto (productos_producto)
 class Producto(models.Model):
-    codigo_producto = models.CharField(max_length=100, unique=True, default="Sin código") 
+    codigo_producto = models.CharField(max_length=100, unique=True, default="Sin código")
     marca = models.CharField(max_length=100)
     nombre = models.CharField(max_length=100)
     descripcion = models.TextField()
     precio_unitario = models.IntegerField(default=0)
     precio_mayorista = models.IntegerField(default=0)
     impuesto = models.IntegerField(default=0)
-    stock_disponible = models.IntegerField(default=0)  
-    unidad_medida = models.CharField(max_length=50, default="unidad")  
+    stock_disponible = models.IntegerField(default=0)
+    unidad_medida = models.CharField(max_length=50, default="unidad")
     activo = models.BooleanField(default=True)
     fecha_creacion = models.DateTimeField(auto_now_add=True)
     fecha_actualizacion = models.DateTimeField(auto_now=True)
-    autor = models.ForeignKey(CustomUser, on_delete=models.CASCADE)  
+    autor = models.ForeignKey(CustomUser, on_delete=models.CASCADE)
     imagen = models.ImageField(upload_to='productos/', null=True, blank=True)
     categoria = models.ForeignKey(Categoria, on_delete=models.CASCADE, null=True, blank=True)
     destacado = models.BooleanField(default=False)
-    
-    
+
+
     def __str__(self):
         return self.nombre
 
 
-# Modelo de Pedido (pedidos_pedido)
+
 class Pedido(models.Model):
     ESTADOS_PEDIDO = [
         ('pendiente', 'Pendiente'),
@@ -74,7 +74,7 @@ class Pedido(models.Model):
         ('en_reparto', 'En reparto'),
         ('entregado', 'Entregado'),
     ]
-    
+
     cliente = models.ForeignKey(CustomUser, on_delete=models.CASCADE)
     tipo_entrega = models.CharField(max_length=50, choices=[('retiro', 'Retiro'), ('domicilio', 'Domicilio')])
     direccion_entrega = models.CharField(max_length=255, blank=True, null=True, default="No especificado")
@@ -82,7 +82,10 @@ class Pedido(models.Model):
     fecha_actualizacion = models.DateTimeField(auto_now=True)
     estado = models.CharField(max_length=20, choices=ESTADOS_PEDIDO, default='pendiente')
 
-    # ✅ Campo para subir comprobante de transferencia
+    payment_id = models.CharField(max_length=100, blank=True, null=True)
+    collection_id = models.CharField(max_length=100, blank=True, null=True)
+
+
     comprobante_transferencia = models.FileField(
         upload_to='comprobantes/',
         null=True,
@@ -93,11 +96,11 @@ class Pedido(models.Model):
     def __str__(self):
         return f"Pedido #{self.id} - {self.cliente} - {self.estado}"
 
-# Modelo de PedidoProducto (pedidos_pedidoproducto)
+
 class PedidoProducto(models.Model):
     pedido = models.ForeignKey(Pedido, on_delete=models.CASCADE)
     producto = models.ForeignKey(Producto, on_delete=models.CASCADE)
-    cantidad = models.IntegerField(default=1)  # Valor predeterminado
+    cantidad = models.IntegerField(default=1)  
 
     def __str__(self):
         return f"{self.producto.nombre} - {self.cantidad} unidades"

@@ -35,7 +35,7 @@ class ProductoAdmin(admin.ModelAdmin):
             'imagen', 'categoria', 'destacado',
             'fecha_creacion', 'fecha_actualizacion'
         ]
-        if obj:  
+        if obj:
             fields.insert(fields.index('imagen'), 'autor')
         return fields
 
@@ -45,13 +45,28 @@ class ProductoAdmin(admin.ModelAdmin):
     ]
     list_filter = ['activo', 'categoria']
     search_fields = ['nombre', 'codigo_producto']
-    
+
+@admin.action(description="Marcar como pagado")
+def marcar_pagado(modeladmin, request, queryset):
+    queryset.update(estado='pagado')
+
+@admin.action(description="Marcar como recolectado")
+def marcar_recolectado(modeladmin, request, queryset):
+    queryset.update(estado='recolectado')
+
+@admin.action(description="Marcar como entregado")
+def marcar_entregado(modeladmin, request, queryset):
+    queryset.update(estado='entregado')
+
+
 @admin.register(Pedido)
 class PedidoAdmin(admin.ModelAdmin):
-    readonly_fields = ['fecha_creacion']
-    list_display = ['id', 'cliente', 'estado', 'fecha_creacion']
+    readonly_fields = ['fecha_creacion', 'fecha_actualizacion']
+    list_display = ['id', 'cliente', 'estado', 'fecha_creacion', 'fecha_actualizacion']
+    list_editable = ['estado']
     list_filter = ['estado']
     search_fields = ['cliente__email']
+    actions = [marcar_pagado, marcar_recolectado, marcar_entregado]
 
 @admin.register(PedidoProducto)
 class PedidoProductoAdmin(admin.ModelAdmin):

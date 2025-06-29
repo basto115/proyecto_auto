@@ -38,6 +38,8 @@ from rest_framework_simplejwt.authentication import JWTAuthentication
 from django.template.loader import get_template
 from xhtml2pdf import pisa
 from django.templatetags.static import static
+import os
+from django.utils import timezone
 
 
 
@@ -57,14 +59,14 @@ def catalogo(request):
         productos = Producto.objects.filter(activo=True)
 
     categorias = Categoria.objects.all()
-    modo_b2b = request.user.is_authenticated and request.user.is_b2b  
+    modo_b2b = request.user.is_authenticated and request.user.is_b2b
 
     return render(request, 'tienda/catalogo.html', {
         'productos': productos,
         'categorias': categorias,
         'categoria_seleccionada': int(categoria_id) if categoria_id else None,
         'modo_b2b': modo_b2b,
-        'mostrar_buscador' : True  
+        'mostrar_buscador' : True
     })
 
 
@@ -92,7 +94,7 @@ def agregar_producto(request, producto_id):
             'cantidad': cantidad,
             'codigo': producto.codigo_producto,
         }
-    
+
     domain = "https://autoparts.pythonanywhere.com"
 
     request.session['carrito'] = carrito
@@ -137,7 +139,7 @@ def checkout(request):
 
     sdk = mercadopago.SDK(settings.MERCADO_PAGO_ACCESS_TOKEN)
 
-    domain = "https://autoparts.pythonanywhere.com"
+    domain = "https://basto.pythonanywhere.com"
 
     preference_data = {
         "items": preference_items,
@@ -151,7 +153,7 @@ def checkout(request):
 
     preference_response = sdk.preference().create(preference_data)
     response_data = preference_response.get("response", {})
-    
+
     productos = []
     for item in carrito.values():
         productos.append({
@@ -175,8 +177,44 @@ def checkout(request):
 
 
 def confirmation(request):
-    request.session['carrito'] = {}  
-    return render(request, 'tienda/confirmation.html')
+    carrito = request.session.get('carrito', {})
+    user = request.user if request.user.is_authenticated else None
+
+    collection_id = request.GET.get('collection_id')
+    payment_id = request.GET.get('payment_id')
+
+    if not carrito or not user:
+        return redirect('ver_carrito')
+
+    for producto_id, item in carrito.items():
+        producto = Producto.objects.get(pk=producto_id)
+        if item['cantidad'] > producto.stock_disponible:
+            return redirect('ver_carrito')
+
+    pedido = Pedido.objects.create(
+        cliente=user,
+        tipo_entrega='domicilio',
+        direccion_entrega='No especificado',
+        estado='pendiente',
+        collection_id=collection_id,
+        payment_id=payment_id,
+    )
+
+    for producto_id, item in carrito.items():
+        producto = Producto.objects.get(pk=producto_id)
+
+        PedidoProducto.objects.create(
+            pedido=pedido,
+            producto=producto,
+            cantidad=item['cantidad']
+        )
+
+        producto.stock_disponible -= item['cantidad']
+        producto.save()
+
+    request.session['carrito'] = {}
+    return render(request, 'tienda/confirmation.html', {"pedido": pedido})
+
 
 def single_product(request, producto_id):
     producto = Producto.objects.get(id=producto_id)
@@ -271,7 +309,7 @@ from django.contrib.auth.decorators import login_required
 def realizar_pedido(request):
     productos_json = "[]"
     carrito = request.session.get("carrito", {})
-    
+
     if carrito:
         productos_json = json.dumps([
             {
@@ -338,7 +376,7 @@ def login_view(request):
 
         if user is not None:
             login(request, user)
-        
+
             #token
             from rest_framework_simplejwt.tokens import RefreshToken
             refresh = RefreshToken.for_user(user)
@@ -370,7 +408,7 @@ def catalogo_por_seccion(request, seccion):
         'seccion': seccion.capitalize(),
         'mostrar_buscador' : True
     })
-    
+
 SECCIONES = {
     'repuestos': ['Filtros de aire', 'Filtros de aceite', 'Bujías', 'Correas de distribución'],
     'frenos': ['Pastillas de freno', 'Discos de freno', 'Amortiguadores', 'Rótulas'],
@@ -413,7 +451,7 @@ def register_view(request):
 
 def logout_view(request):
     logout(request)
-    return redirect('home')  
+    return redirect('home')
 
 class RegisterUserView(APIView):
     permission_classes = [AllowAny]
@@ -423,7 +461,7 @@ class RegisterUserView(APIView):
             user = serializer.save()
             return Response({'message': 'Usuario registrado correctamente.'}, status=status.HTTP_201_CREATED)
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
-    
+
 
 
 
@@ -504,9 +542,9 @@ class ProductoDetalleView(RetrieveAPIView):
     queryset = Producto.objects.all()
     serializer_class = ProductoSerializer
     permission_classes = [AllowAny]
-    authentication_classes = [JWTAuthentication]  
+    authentication_classes = [JWTAuthentication]
     lookup_field = 'id'
-    
+
 class HistorialPedidosView(APIView):
     def get(self, request):
         email = request.query_params.get('email')
@@ -538,7 +576,7 @@ class ActualizarEstadoPedidoView(APIView):
 
         try:
             pedido = Pedido.objects.get(id=pedido_id)
-            
+
         except Pedido.DoesNotExist:
             return Response({'error': 'Pedido no encontrado'}, status=status.HTTP_404_NOT_FOUND)
 
@@ -572,7 +610,7 @@ class SubirComprobanteView(APIView):
         pedido.save()
 
         return Response({"mensaje": "Comprobante subido correctamente"}, status=200)
-    
+
 class PedidosPendientesView(APIView):
     def get(self, request):
         pedidos = Pedido.objects.filter(estado="pendiente").order_by("-fecha_creacion")
@@ -597,7 +635,7 @@ class PedidosPendientesView(APIView):
             })
 
         return Response(data, status=status.HTTP_200_OK)
-    
+
 
 def rol_requerido(rol_permitido):
     def decorator(view_func):
@@ -644,10 +682,10 @@ def buscar_productos(request):
         'query': query,
     })
 
-        
+
 class PedidoDetalleView(APIView):
     permission_classes = [IsAuthenticated]
-    
+
     def get(self, request, pedido_id):
         try:
             pedido = Pedido.objects.get(id=pedido_id)
@@ -655,9 +693,9 @@ class PedidoDetalleView(APIView):
             return Response(serializer.data)
         except Pedido.DoesNotExist:
             return Response({'error': 'Pedido no encontrado'}, status=status.HTTP_404_NOT_FOUND)
-        
+
 class LoginView(APIView):
-    permission_classes = [AllowAny]  
+    permission_classes = [AllowAny]
 
     def post(self, request):
         email = request.data.get('email')
@@ -669,7 +707,7 @@ class LoginView(APIView):
             return Response({'token': token.key})
         else:
             return Response({'error': 'Credenciales inválidas'}, status=status.HTTP_401_UNAUTHORIZED)
-        
+
 class GenerarCotizacionPDF(APIView):
     permission_classes = [IsAuthenticated]
 
@@ -685,11 +723,11 @@ class GenerarCotizacionPDF(APIView):
         if request.user != pedido.cliente and not request.user.is_staff:
             return Response({'error': 'No autorizado'}, status=403)
 
-        
+
         response = HttpResponse(content_type='application/pdf')
         response['Content-Disposition'] = f'attachment; filename="cotizacion_pedido_{pedido.id}.pdf"'
 
-        
+
         p = canvas.Canvas(response, pagesize=letter)
         width, height = letter
         y = height - 50
@@ -720,7 +758,7 @@ class GenerarCotizacionPDF(APIView):
             linea = f"- {detalle.producto.nombre}  ({detalle.cantidad} x ${detalle.producto.precio_unitario:,}) = ${subtotal:,}"
             p.drawString(60, y, linea)
             y -= 20
-            if y < 100:  
+            if y < 100:
                 p.showPage()
                 y = height - 50
 
@@ -735,8 +773,8 @@ class GenerarCotizacionPDF(APIView):
 class ProductoListView(ListAPIView):
     queryset = Producto.objects.all()
     serializer_class = ProductoSerializer
-    permission_classes = [AllowAny] 
-    
+    permission_classes = [AllowAny]
+
 
 class EmailTokenObtainPairSerializer(TokenObtainPairSerializer):
     def validate(self, attrs):
@@ -757,7 +795,7 @@ class EmailTokenObtainPairSerializer(TokenObtainPairSerializer):
 
 class EmailTokenObtainPairView(TokenObtainPairView):
     serializer_class = EmailTokenObtainPairSerializer
-    
+
 class CotizarEnvioChilexpressView(APIView):
     permission_classes = [AllowAny]
 
@@ -813,7 +851,7 @@ class BuscarCalleGeoreferenciaChilexpressView(APIView):
         try:
             response = requests.get(url, headers=headers, params=params)
 
-            
+
             print("URL solicitada a Chilexpress:", response.url)
             print("Status Code:", response.status_code)
             print("Respuesta:", response.text)
@@ -830,7 +868,7 @@ def generar_cotizacion(request):
 
         total_productos = sum(p['precio'] * p['cantidad'] for p in productos)
         total_final = total_productos + mano_obra
-        logo_path = request.build_absolute_uri(static('img/logo_auto.png'))
+        logo_path = os.path.join(settings.BASE_DIR, 'static', 'img', 'logo_auto.png')
 
         context = {
             'productos': productos,
@@ -848,5 +886,19 @@ def generar_cotizacion(request):
         response['Content-Disposition'] = 'attachment; filename="cotizacion.pdf"'
         pisa.CreatePDF(html, dest=response)
         return response
-    
-    
+
+def generar_comprobante_pdf(request, pedido_id):
+    pedido = Pedido.objects.get(pk=pedido_id)
+    productos = PedidoProducto.objects.filter(pedido=pedido)
+
+    total = sum([pp.producto.precio_unitario * pp.cantidad for pp in productos])
+
+    template = get_template('tienda/comprobante_pdf.html')
+    html = template.render({'pedido': pedido, 'productos': productos, 'total': total})
+
+    response = HttpResponse(content_type='application/pdf')
+    response['Content-Disposition'] = f'attachment; filename="comprobante_{pedido.id}.pdf"'
+
+    pisa.CreatePDF(html, dest=response)
+    return response
+

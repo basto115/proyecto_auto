@@ -11,7 +11,7 @@ urlpatterns = [
     path('', views.home, name="home"),
     path('catalogo/', views.catalogo, name='catalogo'),
     path('blog/', views.blog, name="blog"),
-    
+
     # HTML login (formulario web tradicional)
     path('login/', login_view, name="login"),
     path('register/', register_view, name='register'),
@@ -39,13 +39,13 @@ urlpatterns = [
     path('pedidos/repartidor/<int:pedido_id>/entregado/', views.marcar_entregado, name='marcar_entregado'),
     path('logout/', logout_view, name='logout'),
 
-    
+
     path('producto/<int:producto_id>/', views.detalle_producto, name='detalle_producto'),
 
-    
+
     path('api/register/', RegisterUserView.as_view(), name='api_register_user'),
-    
-    
+
+
     path('api/pedidos/usuario/<int:user_id>/', PedidosPorUsuarioView.as_view(), name='pedidos_usuario'),
     path('api/orders/', CrearPedidoPorIDView.as_view(), name='crear_pedido'),
     path('api/pedidos/crear/', CrearPedidoPorEmailView.as_view()),
@@ -59,21 +59,22 @@ urlpatterns = [
     path('api/auth/login/', LoginView.as_view(), name='api_login'),
     path('api/pedidos/<int:pedido_id>/cotizacion_pdf/', GenerarCotizacionPDF.as_view(), name='cotizacion_pdf'),
     path('api/products/', ProductoListView.as_view(), name='lista_productos'),
-    
+
     path('api/login/', TokenObtainPairView.as_view(), name='token_obtain_pair'),
     path('token/refresh/', TokenRefreshView.as_view(), name='token_refresh'),
     path('api/login/', EmailTokenObtainPairView.as_view(), name='email_token_obtain_pair'),
-    
+
     #chilexpress
     path('api/chilexpress/cotizar/', CotizarEnvioChilexpressView.as_view(), name='cotizar_envio'),
 
     path('distribuidores/', vista_distribuidores, name='vista_distribuidores'),
     path('buscar/', views.buscar_productos, name='buscar_productos'),
-    
+
     path('<str:seccion>/', views.catalogo_por_seccion, name='catalogo_por_seccion'),
     path('chilexpress/calles/', BuscarCalleGeoreferenciaChilexpressView.as_view(), name='buscar-calles-chilexpress'),
     path('cotizacion/generar/', views.generar_cotizacion, name='generar_cotizacion'),
-    
+    path('comprobante/<int:pedido_id>/', views.generar_comprobante_pdf, name='generar_comprobante'),
+
 
 ]
 
