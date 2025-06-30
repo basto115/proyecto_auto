@@ -64,7 +64,7 @@ class Producto(models.Model):
         return self.nombre
 
 
-
+# Modelo de Pedido (pedidos_pedido)
 class Pedido(models.Model):
     ESTADOS_PEDIDO = [
         ('pendiente', 'Pendiente'),
@@ -85,7 +85,7 @@ class Pedido(models.Model):
     payment_id = models.CharField(max_length=100, blank=True, null=True)
     collection_id = models.CharField(max_length=100, blank=True, null=True)
 
-
+    # ✅ Campo para subir comprobante de transferencia
     comprobante_transferencia = models.FileField(
         upload_to='comprobantes/',
         null=True,
@@ -96,12 +96,12 @@ class Pedido(models.Model):
     def __str__(self):
         return f"Pedido #{self.id} - {self.cliente} - {self.estado}"
 
-
+# Modelo de PedidoProducto (pedidos_pedidoproducto)
 class PedidoProducto(models.Model):
     pedido = models.ForeignKey(Pedido, on_delete=models.CASCADE)
     producto = models.ForeignKey(Producto, on_delete=models.CASCADE)
-    cantidad = models.IntegerField(default=1)  
+    cantidad = models.IntegerField(default=1)  # Valor predeterminado
 
     def __str__(self):
         return f"{self.producto.nombre} - {self.cantidad} unidades"
-
+    
